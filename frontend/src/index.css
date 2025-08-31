@@ -1,0 +1,122 @@
+@import "tailwindcss";
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1A1A1A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FF2DD1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B8207A;
+}
+
+/* Hide default cursor everywhere - enhanced approach */
+*, *::before, *::after, html, body, #root {
+  cursor: none !important;
+}
+
+body {
+  cursor: none !important;
+  background: #0A0A0A;
+}
+
+html {
+  cursor: none !important;
+}
+
+/* Force hide cursor on all interactive elements */
+a, button, input, textarea, select, [role="button"], [onclick], [onmousedown], [onmouseup] {
+  cursor: none !important;
+}
+
+/* Additional fallback */
+.cursor-none {
+  cursor: none !important;
+}
+
+/* Create custom cursor */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(45deg, rgba(255, 45, 209, 0.4), rgba(99, 200, 255, 0.4));
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+  transition: width 0.2s ease, height 0.2s ease;
+  box-shadow: 0 0 10px rgba(255, 45, 209, 0.2);
+}
+
+/* Hover effect - larger with glow */
+.custom-cursor.hover {
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(45deg, rgba(77, 255, 190, 0.5), rgba(253, 255, 184, 0.5));
+  box-shadow: 0 0 20px rgba(77, 255, 190, 0.3);
+}
+
+/* Click effect - smaller and brighter */
+.custom-cursor.click {
+  width: 10px;
+  height: 10px;
+  background: rgba(253, 255, 184, 0.6);
+  box-shadow: 0 0 15px rgba(253, 255, 184, 0.4);
+}
+
+@import "tailwindcss";
+
+/* === GLOBAL LAYOUT FIXES === */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;          /* No horizontal scroll */
+  background: #0A0A0A;
+  cursor: none !important;
+  /* Prevent width jump when vertical scrollbar appears */
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Hide scrollbars everywhere */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* Keep your custom cursor everywhere */
+*, *::before, *::after, html, body, #root { cursor: none !important; }
+a, button, input, textarea, select, [role="button"], [onclick], [onmousedown], [onmouseup] { cursor: none !important; }
+
+/* Custom cursor styles (unchanged) */
+.custom-cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 14px; height: 14px;
+  background: linear-gradient(45deg, rgba(255, 45, 209, 0.4), rgba(99, 200, 255, 0.4));
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+  transition: width 0.2s ease, height 0.2s ease;
+  box-shadow: 0 0 10px rgba(255, 45, 209, 0.2);
+}
+.custom-cursor.hover {
+  width: 20px; height: 20px;
+  background: linear-gradient(45deg, rgba(77, 255, 190, 0.5), rgba(253, 255, 184, 0.5));
+  box-shadow: 0 0 20px rgba(77, 255, 190, 0.3);
+}
+.custom-cursor.click {
+  width: 10px; height: 10px;
+  background: rgba(253, 255, 184, 0.6);
+  box-shadow: 0 0 15px rgba(253, 255, 184, 0.4);
+}

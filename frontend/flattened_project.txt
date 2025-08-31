@@ -1,0 +1,1123 @@
+====== PROJECT METADATA ======
+Timestamp: Sun Aug 31 20:07:38 IST 2025
+Node: v24.2.0
+npm: 11.5.2
+npx tailwindcss: not installed
+Vite: vite/7.1.3 darwin-arm64 node-v24.2.0
+OS: Darwin Pratiks-MacBook-Air.local 24.6.0 Darwin Kernel Version 24.6.0: Mon Jul 14 11:29:54 PDT 2025; root:xnu-11417.140.69~1/RELEASE_ARM64_T8122 arm64
+Working directory: /Users/pratikchoudhuri/Documents/Codes and IT/Personal/portfolio/frontend
+
+====== package.json ======
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-icons": "^5.5.0",
+    "react-tsparticles": "^2.12.2",
+    "tsparticles": "^3.9.1",
+    "tsparticles-slim": "^2.12.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@tailwindcss/vite": "^4.1.12",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "vite": "^7.1.2"
+  }
+}
+
+====== postcss.config.js ======
+no postcss.config.js
+
+====== tailwind.config.js ======
+export default {
+  theme: {
+    extend: {
+      colors: {
+        // Main palette colors
+        primary: "#FF2DD1",      // Bright pink
+        secondary: "#FDFFB8",    // Light yellow
+        tertiary: "#4DFFBE",     // Mint green
+        quaternary: "#63C8FF",   // Light blue
+        
+        // Background colors
+        bgMain: "#0A0A0A",       // Very dark for contrast
+        bgLight: "#1A1A1A",      // Dark grey
+        bgCard: "#2A2A2A",       // Medium dark for cards
+        
+        // Accent variations
+        accentPink: "#FF2DD1",
+        accentYellow: "#FDFFB8", 
+        accentMint: "#4DFFBE",
+        accentBlue: "#63C8FF",
+        
+        // Darker variants for backgrounds/borders
+        accentPinkDark: "#B8207A",
+        accentYellowDark: "#B8BA5C",
+        accentMintDark: "#2DB884",
+        accentBlueDark: "#3A8CB8",
+        
+        // Text colors
+        textPrimary: "#FFFFFF",
+        textSecondary: "#E0E0E0",
+        textMuted: "#A0A0A0",
+      },
+    },
+  },
+}
+====== PROJECT FILES ======
+====== ./index.html ======
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
+
+
+====== ./tailwind.config.js ======
+export default {
+  theme: {
+    extend: {
+      colors: {
+        // Main palette colors
+        primary: "#FF2DD1",      // Bright pink
+        secondary: "#FDFFB8",    // Light yellow
+        tertiary: "#4DFFBE",     // Mint green
+        quaternary: "#63C8FF",   // Light blue
+        
+        // Background colors
+        bgMain: "#0A0A0A",       // Very dark for contrast
+        bgLight: "#1A1A1A",      // Dark grey
+        bgCard: "#2A2A2A",       // Medium dark for cards
+        
+        // Accent variations
+        accentPink: "#FF2DD1",
+        accentYellow: "#FDFFB8", 
+        accentMint: "#4DFFBE",
+        accentBlue: "#63C8FF",
+        
+        // Darker variants for backgrounds/borders
+        accentPinkDark: "#B8207A",
+        accentYellowDark: "#B8BA5C",
+        accentMintDark: "#2DB884",
+        accentBlueDark: "#3A8CB8",
+        
+        // Text colors
+        textPrimary: "#FFFFFF",
+        textSecondary: "#E0E0E0",
+        textMuted: "#A0A0A0",
+      },
+    },
+  },
+}
+
+====== ./vite.config.js ======
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [react(), tailwindcss()],
+})
+
+====== ./README.md ======
+# React + Vite
+
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+
+Currently, two official plugins are available:
+
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+
+## Expanding the ESLint configuration
+
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+
+====== ./package.json ======
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-icons": "^5.5.0",
+    "react-tsparticles": "^2.12.2",
+    "tsparticles": "^3.9.1",
+    "tsparticles-slim": "^2.12.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.33.0",
+    "@tailwindcss/vite": "^4.1.12",
+    "@types/react": "^19.1.10",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "eslint": "^9.33.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.20",
+    "globals": "^16.3.0",
+    "vite": "^7.1.2"
+  }
+}
+
+
+====== ./eslint.config.js ======
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs['recommended-latest'],
+      reactRefresh.configs.vite,
+    ],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+      parserOptions: {
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
+      },
+    },
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+    },
+  },
+])
+
+
+====== ./src/App.css ======
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+
+====== ./src/index.css ======
+@import "tailwindcss";
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1A1A1A;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #FF2DD1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #B8207A;
+}
+
+/* Hide default cursor everywhere - enhanced approach */
+*, *::before, *::after, html, body, #root {
+  cursor: none !important;
+}
+
+body {
+  cursor: none !important;
+  background: #0A0A0A;
+}
+
+html {
+  cursor: none !important;
+}
+
+/* Force hide cursor on all interactive elements */
+a, button, input, textarea, select, [role="button"], [onclick], [onmousedown], [onmouseup] {
+  cursor: none !important;
+}
+
+/* Additional fallback */
+.cursor-none {
+  cursor: none !important;
+}
+
+/* Create custom cursor */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  background: linear-gradient(45deg, rgba(255, 45, 209, 0.4), rgba(99, 200, 255, 0.4));
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+  transition: width 0.2s ease, height 0.2s ease;
+  box-shadow: 0 0 10px rgba(255, 45, 209, 0.2);
+}
+
+/* Hover effect - larger with glow */
+.custom-cursor.hover {
+  width: 20px;
+  height: 20px;
+  background: linear-gradient(45deg, rgba(77, 255, 190, 0.5), rgba(253, 255, 184, 0.5));
+  box-shadow: 0 0 20px rgba(77, 255, 190, 0.3);
+}
+
+/* Click effect - smaller and brighter */
+.custom-cursor.click {
+  width: 10px;
+  height: 10px;
+  background: rgba(253, 255, 184, 0.6);
+  box-shadow: 0 0 15px rgba(253, 255, 184, 0.4);
+}
+
+====== ./src/components/ui/CustomCursor.jsx ======
+// src/components/ui/CustomCursor.jsx - Optimized for smooth movement
+import React, { useEffect, useRef, useState } from 'react';
+
+const CustomCursor = () => {
+  const cursorRef = useRef(null);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isClicking, setIsClicking] = useState(false);
+  
+  // Use refs for position to avoid unnecessary re-renders
+  const mousePosition = useRef({ x: 0, y: 0 });
+
+  useEffect(() => {
+    let animationId;
+    
+    const updateCursor = (e) => {
+      mousePosition.current = { x: e.clientX, y: e.clientY };
+    };
+
+    const animate = () => {
+      if (cursorRef.current) {
+        const { x, y } = mousePosition.current;
+        cursorRef.current.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%)`;
+      }
+      animationId = requestAnimationFrame(animate);
+    };
+
+    const handleMouseOver = (e) => {
+      // Check if hovering over interactive elements
+      const isInteractive = e.target.closest('a, button, [onclick]');
+      setIsHovering(!!isInteractive);
+    };
+
+    const handleMouseDown = () => {
+      setIsClicking(true);
+    };
+
+    const handleMouseUp = () => {
+      setIsClicking(false);
+    };
+
+    // Start animation loop
+    animationId = requestAnimationFrame(animate);
+
+    // Add event listeners
+    document.addEventListener('mousemove', updateCursor, { passive: true });
+    document.addEventListener('mouseover', handleMouseOver, { passive: true });
+    document.addEventListener('mousedown', handleMouseDown, { passive: true });
+    document.addEventListener('mouseup', handleMouseUp, { passive: true });
+
+    return () => {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+      document.removeEventListener('mousemove', updateCursor);
+      document.removeEventListener('mouseover', handleMouseOver);
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, []);
+
+  return (
+    <div
+      ref={cursorRef}
+      className={`custom-cursor ${isHovering ? 'hover' : ''} ${isClicking ? 'click' : ''}`}
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+      }}
+    />
+  );
+};
+
+export default CustomCursor;
+
+====== ./src/components/ui/ProjectCard.jsx ======
+// src/components/ui/ProjectCard.jsx
+import React from 'react';
+import { FaGithub, FaLinkedin, FaExternalLinkAlt } from 'react-icons/fa';
+
+const ProjectCard = ({ project, index }) => {
+  const isGithub = project.type === 'github';
+
+  return (
+    <div
+      className="group relative rounded-xl p-6 transition-all duration-500 hover:scale-105"
+      style={{
+        background: 'linear-gradient(135deg, rgba(255, 45, 209, 0.08), rgba(77, 255, 190, 0.08))',
+        backdropFilter: 'blur(15px)',
+        border: '1px solid rgba(255, 45, 209, 0.15)',
+        animation: `slideIn 0.8s ease-out ${index * 0.3}s both`
+      }}
+    >
+      {/* Header with Icon and Link */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          {isGithub ? (
+            <FaGithub className="text-white text-2xl" />
+          ) : (
+            <FaLinkedin className="text-quaternary text-2xl" />
+          )}
+          <span className="text-gray-400 text-sm uppercase tracking-wider font-medium">
+            {project.type} Project
+          </span>
+        </div>
+        <a
+          href={project.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-gray-400 hover:text-primary transition-colors duration-300 p-2 rounded-full hover:bg-white/10"
+        >
+          <FaExternalLinkAlt size={16} />
+        </a>
+      </div>
+
+      {/* Project Image/Preview */}
+      <div className="mb-5 rounded-lg overflow-hidden relative">
+        <img
+          src={project.image}
+          alt={project.title}
+          className="w-full h-52 object-cover group-hover:scale-110 transition-transform duration-700"
+          onError={(e) => {
+            e.target.style.display = 'none';
+            e.target.nextSibling.style.display = 'flex';
+          }}
+        />
+        <div 
+          className="w-full h-52 bg-gradient-to-br from-primary/15 to-tertiary/15 hidden items-center justify-center rounded-lg"
+        >
+          <div className="text-center">
+            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-gradient-to-r from-primary/30 to-tertiary/30 flex items-center justify-center">
+              {isGithub ? <FaGithub size={24} /> : <FaLinkedin size={24} />}
+            </div>
+            <span className="text-gray-400 text-sm">Project Preview</span>
+          </div>
+        </div>
+        
+        {/* Overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+          <span className="text-white text-sm font-medium">View Project →</span>
+        </div>
+      </div>
+
+      {/* Project Title */}
+      <h3 
+        className="text-xl font-bold mb-3"
+        style={{
+          background: 'linear-gradient(135deg, #FFFFFF, #FDFFB8)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          backgroundClip: 'text'
+        }}
+      >
+        {project.title}
+      </h3>
+      
+      {/* Description */}
+      <p className="text-gray-300 text-sm mb-5 leading-relaxed line-clamp-3">
+        {project.description}
+      </p>
+
+      {/* Tech Stack */}
+      <div className="flex flex-wrap gap-2 mb-5">
+        {project.techStack.slice(0, 4).map((tech) => (
+          <span
+            key={tech}
+            className="px-3 py-1 text-xs font-medium rounded-full transition-all duration-300 hover:scale-105"
+            style={{
+              background: isGithub 
+                ? 'linear-gradient(135deg, rgba(255, 45, 209, 0.2), rgba(99, 200, 255, 0.2))'
+                : 'linear-gradient(135deg, rgba(77, 255, 190, 0.2), rgba(253, 255, 184, 0.2))',
+              color: '#FFFFFF',
+              border: `1px solid ${isGithub ? 'rgba(255, 45, 209, 0.3)' : 'rgba(77, 255, 190, 0.3)'}`
+            }}
+          >
+            {tech}
+          </span>
+        ))}
+        {project.techStack.length > 4 && (
+          <span className="text-gray-500 text-xs px-2">
+            +{project.techStack.length - 4} more
+          </span>
+        )}
+      </div>
+
+      {/* Stats */}
+      <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center space-x-4 text-gray-400">
+          {isGithub ? (
+            <>
+              <span className="flex items-center space-x-1">
+                <span>⭐</span>
+                <span>{project.stats.stars}</span>
+              </span>
+              <span className="flex items-center space-x-1">
+                <span>🍴</span>
+                <span>{project.stats.forks}</span>
+              </span>
+            </>
+          ) : (
+            <>
+              <span className="flex items-center space-x-1">
+                <span>👍</span>
+                <span>{project.stats.likes}</span>
+              </span>
+              <span className="flex items-center space-x-1">
+                <span>💬</span>
+                <span>{project.stats.comments}</span>
+              </span>
+            </>
+          )}
+        </div>
+        
+        <span 
+          className="text-xs px-2 py-1 rounded-full"
+          style={{
+            background: isGithub ? 'rgba(255, 45, 209, 0.2)' : 'rgba(77, 255, 190, 0.2)',
+            color: isGithub ? '#FF2DD1' : '#4DFFBE'
+          }}
+        >
+          {isGithub ? 'Open Source' : 'Professional'}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export default ProjectCard;
+
+====== ./src/components/sections/WorkCarousel.jsx ======
+// src/components/sections/WorkCarousel.jsx
+import React, { useState } from 'react';
+import { FaGithub, FaLinkedin, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+
+const WorkCarousel = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Sample work data - replace with your actual projects
+  const projects = [
+    {
+      id: 1,
+      type: 'github',
+      title: 'AI Data Dashboard',
+      description: 'Interactive dashboard for analyzing machine learning model performance with real-time metrics and visualizations.',
+      techStack: ['React', 'Python', 'TensorFlow', 'D3.js'],
+      link: 'https://github.com/yourusername/project1',
+      image: '/assets/project1.png', // Add your project images
+      stats: { stars: 45, forks: 12 }
+    },
+    {
+      id: 2,
+      type: 'linkedin',
+      title: 'Market Analysis Report',
+      description: 'Deep dive into emerging market trends using advanced statistical modeling and predictive analytics.',
+      techStack: ['Python', 'Pandas', 'Matplotlib', 'SQL'],
+      link: 'https://linkedin.com/posts/yourprofile/post1',
+      image: '/assets/project2.png',
+      stats: { likes: 156, comments: 23 }
+    },
+    {
+      id: 3,
+      type: 'github',
+      title: 'Full-Stack E-commerce',
+      description: 'Complete e-commerce solution with payment integration, inventory management, and analytics.',
+      techStack: ['Node.js', 'React', 'MongoDB', 'Stripe'],
+      link: 'https://github.com/yourusername/project3',
+      image: '/assets/project3.png',
+      stats: { stars: 78, forks: 21 }
+    },
+    {
+      id: 4,
+      type: 'linkedin',
+      title: 'UX Design Case Study',
+      description: 'Complete redesign of a mobile banking app focusing on accessibility and user experience.',
+      techStack: ['Figma', 'Principle', 'User Research', 'Prototyping'],
+      link: 'https://linkedin.com/posts/yourprofile/post2',
+      image: '/assets/project4.png',
+      stats: { likes: 89, comments: 15 }
+    }
+  ];
+
+  const nextSlide = () => {
+    setCurrentIndex((prev) => (prev + 1) % Math.ceil(projects.length / 2));
+  };
+
+  const prevSlide = () => {
+    setCurrentIndex((prev) => (prev - 1 + Math.ceil(projects.length / 2)) % Math.ceil(projects.length / 2));
+  };
+
+  const getVisibleProjects = () => {
+    const startIndex = currentIndex * 2;
+    return projects.slice(startIndex, startIndex + 2);
+  };
+
+  return (
+    <section className="relative z-10 py-20">
+      <div className="max-w-6xl mx-auto px-6">
+        {/* Section Header */}
+        <div className="text-center mb-16">
+          <h2 
+            className="text-4xl lg:text-5xl font-bold mb-4"
+            style={{
+              background: 'linear-gradient(135deg, #FF2DD1, #4DFFBE)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}
+          >
+            Featured Work
+          </h2>
+          <p className="text-gray-400 text-lg">
+            A showcase of my latest projects and insights
+          </p>
+        </div>
+
+        {/* Carousel Container */}
+        <div className="relative">
+          {/* Navigation Arrows */}
+          <button
+            onClick={prevSlide}
+            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 p-3 rounded-full bg-gradient-to-r from-primary to-quaternary text-white hover:shadow-lg transition-all duration-300"
+            style={{ boxShadow: '0 4px 15px rgba(255, 45, 209, 0.3)' }}
+          >
+            <FaChevronLeft size={20} />
+          </button>
+
+          <button
+            onClick={nextSlide}
+            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 p-3 rounded-full bg-gradient-to-r from-tertiary to-quaternary text-white hover:shadow-lg transition-all duration-300"
+            style={{ boxShadow: '0 4px 15px rgba(77, 255, 190, 0.3)' }}
+          >
+            <FaChevronRight size={20} />
+          </button>
+
+          {/* Cards Container */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {getVisibleProjects().map((project, index) => (
+              <div
+                key={project.id}
+                className="group relative rounded-xl p-6 transition-all duration-500 hover:scale-105"
+                style={{
+                  background: 'linear-gradient(135deg, rgba(255, 45, 209, 0.1), rgba(77, 255, 190, 0.1))',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 45, 209, 0.2)',
+                  animation: `slideIn 0.6s ease-out ${index * 0.2}s both`
+                }}
+              >
+                {/* Project Type Icon */}
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    {project.type === 'github' ? (
+                      <FaGithub className="text-white text-xl" />
+                    ) : (
+                      <FaLinkedin className="text-quaternary text-xl" />
+                    )}
+                    <span className="text-gray-400 text-sm uppercase tracking-wide">
+                      {project.type}
+                    </span>
+                  </div>
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-gray-400 hover:text-white transition-colors"
+                  >
+                    <FaExternalLinkAlt size={16} />
+                  </a>
+                </div>
+
+                {/* Project Image */}
+                <div className="mb-4 rounded-lg overflow-hidden">
+                  <img
+                    src={project.image}
+                    alt={project.title}
+                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div 
+                    className="w-full h-48 bg-gradient-to-br from-primary/20 to-tertiary/20 hidden items-center justify-center rounded-lg"
+                  >
+                    <span className="text-gray-400">Project Preview</span>
+                  </div>
+                </div>
+
+                {/* Project Info */}
+                <h3 className="text-xl font-bold text-white mb-2">
+                  {project.title}
+                </h3>
+                
+                <p className="text-gray-300 text-sm mb-4 leading-relaxed">
+                  {project.description}
+                </p>
+
+                {/* Tech Stack */}
+                <div className="flex flex-wrap gap-2 mb-4">
+                  {project.techStack.map((tech) => (
+                    <span
+                      key={tech}
+                      className="px-3 py-1 text-xs font-medium rounded-full"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(255, 45, 209, 0.2), rgba(77, 255, 190, 0.2))',
+                        color: '#FDFFB8',
+                        border: '1px solid rgba(255, 45, 209, 0.3)'
+                      }}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Stats */}
+                <div className="flex items-center space-x-4 text-sm text-gray-400">
+                  {project.type === 'github' ? (
+                    <>
+                      <span>⭐ {project.stats.stars}</span>
+                      <span>🍴 {project.stats.forks}</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>👍 {project.stats.likes}</span>
+                      <span>💬 {project.stats.comments}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Carousel Indicators */}
+          <div className="flex justify-center mt-8 space-x-2">
+            {Array.from({ length: Math.ceil(projects.length / 2) }).map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  index === currentIndex ? 'bg-primary scale-125' : 'bg-gray-600 hover:bg-gray-500'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default WorkCarousel;
+
+====== ./src/components/layout/Navbar.jsx ======
+// src/components/layout/Navbar.jsx - Updated with new color palette
+import React, { useState } from "react";
+import { HiMenu, HiX } from "react-icons/hi";
+
+export const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  
+  const navLinks = ["Work", "About", "Blog", "Resume", "Contact"];
+
+  return (
+    <nav 
+      className="sticky top-0 left-0 w-full z-50"
+    >
+      <div className="max-w-7xl mx-auto px-6 flex justify-between items-center h-20">
+        {/* Logo/Brand */}
+        <div 
+          className="text-2xl font-bold text-white"
+          style={{
+            textShadow: '0 0 15px rgba(255, 255, 255, 0.8)'
+          }}
+        >
+          Pratik
+        </div>
+
+        {/* Desktop Menu */}
+        <div className="hidden md:flex space-x-8">
+          {navLinks.map((link, index) => (
+            <a
+              key={link}
+              href="#"
+              className="font-medium text-white hover:text-accentYellow transition-all duration-300 relative group"
+              style={{
+                textShadow: '0 0 10px rgba(255, 255, 255, 0.5)'
+              }}
+            >
+              {link}
+              <span 
+                className="absolute -bottom-1 left-0 w-0 h-0.5 transition-all duration-300 group-hover:w-full"
+                style={{ 
+                  background: index % 2 === 0 ? '#FF2DD1' : '#4DFFBE' 
+                }}
+              ></span>
+            </a>
+          ))}
+        </div>
+
+        {/* Mobile menu button */}
+        <div className="md:hidden">
+          <button
+            onClick={() => setIsOpen(!isOpen)}
+            className="p-2 text-white hover:text-accentYellow transition-colors"
+          >
+            {isOpen ? <HiX size={24} /> : <HiMenu size={24} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isOpen && (
+        <div 
+          className="md:hidden absolute top-20 left-0 w-full"
+        >
+          <div className="px-6 py-6 space-y-4">
+            {navLinks.map((link, index) => (
+              <a
+                key={link}
+                href="#"
+                className="block font-medium text-gray-100 hover:text-white transition-colors"
+                onClick={() => setIsOpen(false)}
+                style={{
+                  textShadow: '0 0 8px rgba(255, 255, 255, 0.6)'
+                }}
+              >
+                {link}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default Navbar;
+
+====== ./src/components/layout/ParticlesBackground.jsx ======
+// src/components/layout/ParticlesBackground.jsx - Updated with new colors
+import React from "react";
+import Particles from "react-tsparticles";
+import { loadSlim } from "tsparticles-slim";
+
+export const ParticlesBackground = () => {
+  const particlesInit = async (engine) => {
+    await loadSlim(engine);
+  };
+
+  return (
+    <Particles
+      id="tsparticles"
+      init={particlesInit}
+      options={{
+        fullScreen: { enable: true, zIndex: -1 },
+        background: { 
+          color: "#0A0A0A"
+        },
+        fpsLimit: 60,
+        particles: {
+          number: { value: 150, density: { enable: true, area: 800 } },
+          color: { value: ["#FF2DD1", "#FDFFB8", "#4DFFBE", "#63C8FF"] },
+          shape: { 
+            type: "circle"
+          },
+          opacity: { 
+            value: 0.6,
+            random: false
+          },
+          size: { 
+            value: { min: 1, max: 2 },
+            random: true
+          },
+          move: {
+            enable: true,
+            speed: 0.8,
+            direction: "none",
+            random: true,
+            straight: false,
+            outModes: { default: "out" },
+            attract: { enable: false },
+          },
+          links: {
+            enable: true,
+            distance: 120,
+            color: "#FF2DD1",
+            opacity: 0.3,
+            width: 1
+          },
+        },
+        interactivity: {
+          events: {
+            onHover: { 
+              enable: true, 
+              mode: ["grab", "bubble"]
+            },
+            onClick: { 
+              enable: false
+            },
+            resize: true,
+          },
+          modes: {
+            grab: { 
+              distance: 150, 
+              links: { 
+                opacity: 0.6,
+                color: "#63C8FF"
+              } 
+            },
+            bubble: { 
+              distance: 100, 
+              size: 4, 
+              duration: 1.5, 
+              opacity: 0.8 
+            }
+          },
+        },
+        detectRetina: true,
+      }}
+    />
+  );
+};
+
+export default ParticlesBackground;
+
+====== ./src/main.jsx ======
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+
+====== ./src/App.jsx ======
+// src/App.jsx - Compact, animated layout with hero intro + WorkCarousel
+import React, { useEffect, useState } from 'react';
+import ParticlesBackground from './components/layout/ParticlesBackground';
+import Navbar from './components/layout/Navbar';
+import CustomCursor from './components/ui/CustomCursor';
+import WorkCarousel from './components/sections/WorkCarousel';
+
+function App() {
+  const [showRest, setShowRest] = useState(false);
+
+  useEffect(() => {
+    // Delay showing rest until hero lines animate
+    const timer = setTimeout(() => setShowRest(true), 3000); // after 3s
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div className="w-screen min-h-screen bg-bgMain cursor-none relative overflow-y-auto overflow-x-hidden hide-scrollbar">
+      {/* Custom Cursor */}
+      <CustomCursor />
+      
+      {/* Particle Background */}
+      <ParticlesBackground />
+      
+      {/* Navigation */}
+      <Navbar />
+
+      {/* Hero Section */}
+      <section className="relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 py-8 max-w-6xl mx-auto">
+        {/* Left Column - Text + CTA */}
+        <div className="flex-1 text-left flex flex-col items-start">
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight space-y-2">
+            <div className="fade-line" style={{ animationDelay: '0.2s' }}>
+              Hi, I'm Pratik
+            </div>
+            <div className="fade-line" style={{ animationDelay: '0.8s' }}>
+              dev, analyst, designer,
+            </div>
+            <div className="fade-line" style={{ animationDelay: '1.4s' }}>
+              creator
+            </div>
+          </h1>
+          
+          {showRest && (
+            <>
+              <p 
+                className="text-sm lg:text-base text-gray-300 leading-relaxed max-w-md mt-4 mb-4 fade-in"
+                style={{ animationDelay: '2s' }}
+              >
+                I'm a developer and analyst who loves turning tricky problems into clever solutions—
+                whether it's models, dashboards, or full-on experiments. I thrive on learning,
+                building, and the occasional debugging adventure.
+              </p>
+
+              {/* CTA Button */}
+              <button 
+                className="px-8 py-3 font-semibold text-bgMain bg-gradient-to-r from-primary to-tertiary rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-sm lg:text-base fade-in"
+                style={{
+                  animationDelay: '2.2s',
+                  boxShadow: '0 6px 16px rgba(255, 45, 209, 0.4)',
+                  background: 'linear-gradient(135deg, #FF2DD1, #4DFFBE)',
+                }}
+              >
+                Know More
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Right Column - Floating Image */}
+        {showRest && (
+          <div className="flex-1 flex justify-center lg:justify-end mt-6 lg:mt-0 fade-in" style={{ animationDelay: '2.4s' }}>
+            <img 
+              src="./src/assets/mypic.png" 
+              alt="Pratik" 
+              className="w-64 h-64 lg:w-[340px] lg:h-[340px] object-contain animate-float"
+              style={{
+                filter: 'drop-shadow(0 0 28px rgba(255, 45, 209, 0.5))'
+              }}
+            />
+          </div>
+        )}
+      </section>
+
+      {/* Work Carousel Section */}
+      {showRest && (
+        <section className="relative z-10 px-4 py-8 max-w-6xl mx-auto fade-in" style={{ animationDelay: '2.8s' }}>
+          <WorkCarousel compact />
+        </section>
+      )}
+
+      <style jsx>{`
+        /* Floating animation */
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-10px); }
+        }
+        .animate-float {
+          animation: float 4s ease-in-out infinite;
+        }
+
+        /* Fade-in animations */
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(20px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-line {
+          opacity: 0;
+          background: linear-gradient(135deg, #FF2DD1, #63C8FF);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: fadeInUp 0.6s forwards;
+        }
+        .fade-in {
+          opacity: 0;
+          animation: fadeInUp 0.8s forwards;
+        }
+
+        /* Hide scrollbar */
+        .hide-scrollbar {
+          -ms-overflow-style: none;  /* IE/Edge */
+          scrollbar-width: none;     /* Firefox */
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+          display: none;             /* Chrome/Safari */
+        }
+      `}</style>
+    </div>
+  );
+}
+
+export default App;
+
+
