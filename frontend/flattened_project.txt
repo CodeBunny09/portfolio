@@ -1,10 +1,10 @@
 ====== PROJECT METADATA ======
-Timestamp: Sun Aug 31 20:07:38 IST 2025
-Node: v24.2.0
-npm: 11.5.2
+Timestamp: Mon Sep  1 16:28:53 IST 2025
+Node: v24.7.0
+npm: 11.5.1
 npx tailwindcss: not installed
-Vite: vite/7.1.3 darwin-arm64 node-v24.2.0
-OS: Darwin Pratiks-MacBook-Air.local 24.6.0 Darwin Kernel Version 24.6.0: Mon Jul 14 11:29:54 PDT 2025; root:xnu-11417.140.69~1/RELEASE_ARM64_T8122 arm64
+Vite: vite/7.1.3 darwin-arm64 node-v24.7.0
+OS: Darwin Mac 24.6.0 Darwin Kernel Version 24.6.0: Mon Jul 14 11:29:54 PDT 2025; root:xnu-11417.140.69~1/RELEASE_ARM64_T8122 arm64
 Working directory: /Users/pratikchoudhuri/Documents/Codes and IT/Personal/portfolio/frontend
 
 ====== package.json ======
@@ -23,6 +23,7 @@ Working directory: /Users/pratikchoudhuri/Documents/Codes and IT/Personal/portfo
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
+    "react-router-dom": "^7.8.2",
     "react-tsparticles": "^2.12.2",
     "tsparticles": "^3.9.1",
     "tsparticles-slim": "^2.12.0"
@@ -174,6 +175,7 @@ If you are developing a production application, we recommend using TypeScript wi
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
+    "react-router-dom": "^7.8.2",
     "react-tsparticles": "^2.12.2",
     "tsparticles": "^3.9.1",
     "tsparticles-slim": "^2.12.0"
@@ -269,6 +271,19 @@ export default defineConfig([
   color: #888;
 }
 
+/* src/App.css — remove width cap & extra padding to keep everything compact */
+#root {
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+}
+
+/* (Keep demo leftovers disabled)
+.logo, .card, .read-the-docs { all: unset; }
+*/
+
+
 
 ====== ./src/index.css ======
 @import "tailwindcss";
@@ -347,6 +362,53 @@ a, button, input, textarea, select, [role="button"], [onclick], [onmousedown], [
   background: rgba(253, 255, 184, 0.6);
   box-shadow: 0 0 15px rgba(253, 255, 184, 0.4);
 }
+
+@import "tailwindcss";
+
+/* === GLOBAL LAYOUT FIXES === */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;          /* No horizontal scroll */
+  background: #0A0A0A;
+  cursor: none !important;
+  /* Prevent width jump when vertical scrollbar appears */
+  scrollbar-gutter: stable both-edges;
+}
+
+/* Hide scrollbars everywhere */
+* { scrollbar-width: none; }
+*::-webkit-scrollbar { width: 0; height: 0; display: none; }
+
+/* Keep your custom cursor everywhere */
+*, *::before, *::after, html, body, #root { cursor: none !important; }
+a, button, input, textarea, select, [role="button"], [onclick], [onmousedown], [onmouseup] { cursor: none !important; }
+
+/* Custom cursor styles (unchanged) */
+.custom-cursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 14px; height: 14px;
+  background: linear-gradient(45deg, rgba(255, 45, 209, 0.4), rgba(99, 200, 255, 0.4));
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 10000;
+  transform: translate(-50%, -50%);
+  will-change: transform;
+  transition: width 0.2s ease, height 0.2s ease;
+  box-shadow: 0 0 10px rgba(255, 45, 209, 0.2);
+}
+.custom-cursor.hover {
+  width: 20px; height: 20px;
+  background: linear-gradient(45deg, rgba(77, 255, 190, 0.5), rgba(253, 255, 184, 0.5));
+  box-shadow: 0 0 20px rgba(77, 255, 190, 0.3);
+}
+.custom-cursor.click {
+  width: 10px; height: 10px;
+  background: rgba(253, 255, 184, 0.6);
+  box-shadow: 0 0 15px rgba(253, 255, 184, 0.4);
+}
+
 
 ====== ./src/components/ui/CustomCursor.jsx ======
 // src/components/ui/CustomCursor.jsx - Optimized for smooth movement
@@ -579,30 +641,29 @@ const ProjectCard = ({ project, index }) => {
 export default ProjectCard;
 
 ====== ./src/components/sections/WorkCarousel.jsx ======
-// src/components/sections/WorkCarousel.jsx
+// src/components/sections/WorkCarousel.jsx — compact mode + tighter spacing + faster animations
 import React, { useState } from 'react';
 import { FaGithub, FaLinkedin, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-const WorkCarousel = () => {
+const WorkCarousel = ({ compact = false }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Sample work data - replace with your actual projects
   const projects = [
     {
       id: 1,
       type: 'github',
       title: 'AI Data Dashboard',
-      description: 'Interactive dashboard for analyzing machine learning model performance with real-time metrics and visualizations.',
+      description: 'Interactive dashboard for analyzing ML model performance with real-time metrics.',
       techStack: ['React', 'Python', 'TensorFlow', 'D3.js'],
       link: 'https://github.com/yourusername/project1',
-      image: '/assets/project1.png', // Add your project images
+      image: '/assets/project1.png',
       stats: { stars: 45, forks: 12 }
     },
     {
       id: 2,
       type: 'linkedin',
       title: 'Market Analysis Report',
-      description: 'Deep dive into emerging market trends using advanced statistical modeling and predictive analytics.',
+      description: 'Emerging market trends using advanced statistical modeling and predictive analytics.',
       techStack: ['Python', 'Pandas', 'Matplotlib', 'SQL'],
       link: 'https://linkedin.com/posts/yourprofile/post1',
       image: '/assets/project2.png',
@@ -612,7 +673,7 @@ const WorkCarousel = () => {
       id: 3,
       type: 'github',
       title: 'Full-Stack E-commerce',
-      description: 'Complete e-commerce solution with payment integration, inventory management, and analytics.',
+      description: 'E-commerce app with payments, inventory management, and analytics.',
       techStack: ['Node.js', 'React', 'MongoDB', 'Stripe'],
       link: 'https://github.com/yourusername/project3',
       image: '/assets/project3.png',
@@ -622,34 +683,30 @@ const WorkCarousel = () => {
       id: 4,
       type: 'linkedin',
       title: 'UX Design Case Study',
-      description: 'Complete redesign of a mobile banking app focusing on accessibility and user experience.',
-      techStack: ['Figma', 'Principle', 'User Research', 'Prototyping'],
+      description: 'Mobile banking app redesign focused on accessibility and UX.',
+      techStack: ['Figma', 'Research', 'Prototyping', 'Testing'],
       link: 'https://linkedin.com/posts/yourprofile/post2',
       image: '/assets/project4.png',
       stats: { likes: 89, comments: 15 }
     }
   ];
 
-  const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % Math.ceil(projects.length / 2));
-  };
-
-  const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + Math.ceil(projects.length / 2)) % Math.ceil(projects.length / 2));
-  };
+  const pages = Math.ceil(projects.length / 2);
+  const nextSlide = () => setCurrentIndex((p) => (p + 1) % pages);
+  const prevSlide = () => setCurrentIndex((p) => (p - 1 + pages) % pages);
 
   const getVisibleProjects = () => {
-    const startIndex = currentIndex * 2;
-    return projects.slice(startIndex, startIndex + 2);
+    const start = currentIndex * 2;
+    return projects.slice(start, start + 2);
   };
 
   return (
-    <section className="relative z-10 py-20">
-      <div className="max-w-6xl mx-auto px-6">
-        {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 
-            className="text-4xl lg:text-5xl font-bold mb-4"
+    <section className={`relative z-10 ${compact ? 'py-4' : 'py-12'}`}>
+      <div className="max-w-6xl mx-auto px-0 lg:px-2">
+        {/* Header */}
+        <div className="text-center mb-6 lg:mb-8">
+          <h2
+            className="text-3xl lg:text-4xl font-bold mb-1"
             style={{
               background: 'linear-gradient(135deg, #FF2DD1, #4DFFBE)',
               WebkitBackgroundClip: 'text',
@@ -659,52 +716,51 @@ const WorkCarousel = () => {
           >
             Featured Work
           </h2>
-          <p className="text-gray-400 text-lg">
-            A showcase of my latest projects and insights
-          </p>
+          <p className="text-gray-400 text-sm lg:text-base">A quick peek at recent projects</p>
         </div>
 
-        {/* Carousel Container */}
         <div className="relative">
-          {/* Navigation Arrows */}
+          {/* Arrows */}
           <button
             onClick={prevSlide}
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-4 z-10 p-3 rounded-full bg-gradient-to-r from-primary to-quaternary text-white hover:shadow-lg transition-all duration-300"
-            style={{ boxShadow: '0 4px 15px rgba(255, 45, 209, 0.3)' }}
+            className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
+            aria-label="Previous"
           >
-            <FaChevronLeft size={20} />
+            <FaChevronLeft size={16} />
           </button>
 
           <button
             onClick={nextSlide}
-            className="absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-4 z-10 p-3 rounded-full bg-gradient-to-r from-tertiary to-quaternary text-white hover:shadow-lg transition-all duration-300"
-            style={{ boxShadow: '0 4px 15px rgba(77, 255, 190, 0.3)' }}
+            className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 transition"
+            aria-label="Next"
           >
-            <FaChevronRight size={20} />
+            <FaChevronRight size={16} />
           </button>
 
-          {/* Cards Container */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
             {getVisibleProjects().map((project, index) => (
               <div
                 key={project.id}
-                className="group relative rounded-xl p-6 transition-all duration-500 hover:scale-105"
+                className={`group relative rounded-xl p-4 transition-transform duration-200 hover:scale-[1.02] ${
+                  compact ? 'text-sm' : 'text-base'
+                }`}
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255, 45, 209, 0.1), rgba(77, 255, 190, 0.1))',
+                  background: 'linear-gradient(135deg, rgba(255,45,209,0.08), rgba(77,255,190,0.08))',
                   backdropFilter: 'blur(10px)',
-                  border: '1px solid rgba(255, 45, 209, 0.2)',
-                  animation: `slideIn 0.6s ease-out ${index * 0.2}s both`
+                  border: '1px solid rgba(255, 45, 209, 0.18)',
+                  animation: `slideIn 0.22s ease-out ${index * 0.06}s both`
                 }}
               >
-                {/* Project Type Icon */}
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center space-x-2">
+                {/* Top Row */}
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
                     {project.type === 'github' ? (
-                      <FaGithub className="text-white text-xl" />
+                      <FaGithub className="text-white text-lg" />
                     ) : (
-                      <FaLinkedin className="text-quaternary text-xl" />
+                      <FaLinkedin className="text-quaternary text-lg" />
                     )}
-                    <span className="text-gray-400 text-sm uppercase tracking-wide">
+                    <span className="text-gray-400 text-xs uppercase tracking-wide">
                       {project.type}
                     </span>
                   </div>
@@ -712,49 +768,55 @@ const WorkCarousel = () => {
                     href={project.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-gray-400 hover:text-white transition-colors"
+                    className="text-gray-400 hover:text-white transition-colors p-1 rounded"
+                    aria-label="Open project"
                   >
-                    <FaExternalLinkAlt size={16} />
+                    <FaExternalLinkAlt size={14} />
                   </a>
                 </div>
 
-                {/* Project Image */}
-                <div className="mb-4 rounded-lg overflow-hidden">
+                {/* Image */}
+                <div className="mb-3 rounded-md overflow-hidden">
                   <img
                     src={project.image}
                     alt={project.title}
-                    className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
+                    className={`w-full ${compact ? 'h-36' : 'h-44'} object-cover group-hover:scale-105 transition-transform duration-200`}
                     onError={(e) => {
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'flex';
+                      e.currentTarget.style.display = 'none';
+                      if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'flex';
                     }}
                   />
-                  <div 
-                    className="w-full h-48 bg-gradient-to-br from-primary/20 to-tertiary/20 hidden items-center justify-center rounded-lg"
-                  >
-                    <span className="text-gray-400">Project Preview</span>
+                  <div className={`${compact ? 'h-36' : 'h-44'} hidden items-center justify-center bg-gradient-to-br from-primary/15 to-tertiary/15`}>
+                    <span className="text-gray-400 text-xs">Project Preview</span>
                   </div>
                 </div>
 
-                {/* Project Info */}
-                <h3 className="text-xl font-bold text-white mb-2">
+                {/* Title */}
+                <h3 className={`font-bold mb-2 ${compact ? 'text-lg' : 'text-xl'}`}
+                    style={{
+                      background: 'linear-gradient(135deg, #FFFFFF, #FDFFB8)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text'
+                    }}>
                   {project.title}
                 </h3>
-                
-                <p className="text-gray-300 text-sm mb-4 leading-relaxed">
+
+                {/* Description */}
+                <p className="text-gray-300 text-xs lg:text-sm mb-3 leading-relaxed line-clamp-3">
                   {project.description}
                 </p>
 
-                {/* Tech Stack */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {project.techStack.map((tech) => (
+                {/* Tech */}
+                <div className="flex flex-wrap gap-1.5 mb-3">
+                  {project.techStack.slice(0, 4).map((tech) => (
                     <span
                       key={tech}
-                      className="px-3 py-1 text-xs font-medium rounded-full"
+                      className="px-2.5 py-0.5 text-[11px] font-medium rounded-full"
                       style={{
-                        background: 'linear-gradient(135deg, rgba(255, 45, 209, 0.2), rgba(77, 255, 190, 0.2))',
-                        color: '#FDFFB8',
-                        border: '1px solid rgba(255, 45, 209, 0.3)'
+                        background: 'linear-gradient(135deg, rgba(255,45,209,0.18), rgba(77,255,190,0.18))',
+                        color: '#FFFFFF',
+                        border: '1px solid rgba(255, 45, 209, 0.26)'
                       }}
                     >
                       {tech}
@@ -763,7 +825,7 @@ const WorkCarousel = () => {
                 </div>
 
                 {/* Stats */}
-                <div className="flex items-center space-x-4 text-sm text-gray-400">
+                <div className="flex items-center gap-4 text-[12px] text-gray-400">
                   {project.type === 'github' ? (
                     <>
                       <span>⭐ {project.stats.stars}</span>
@@ -780,25 +842,34 @@ const WorkCarousel = () => {
             ))}
           </div>
 
-          {/* Carousel Indicators */}
-          <div className="flex justify-center mt-8 space-x-2">
-            {Array.from({ length: Math.ceil(projects.length / 2) }).map((_, index) => (
+          {/* Dots */}
+          <div className="flex justify-center mt-5 gap-1.5">
+            {Array.from({ length: pages }).map((_, i) => (
               <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  index === currentIndex ? 'bg-primary scale-125' : 'bg-gray-600 hover:bg-gray-500'
+                key={i}
+                onClick={() => setCurrentIndex(i)}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  i === currentIndex ? 'bg-primary scale-125' : 'bg-gray-600 hover:bg-gray-500'
                 }`}
+                aria-label={`Go to slide ${i + 1}`}
               />
             ))}
           </div>
         </div>
       </div>
+
+      <style>{`
+        @keyframes slideIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </section>
   );
 };
 
 export default WorkCarousel;
+
 
 ====== ./src/components/layout/Navbar.jsx ======
 // src/components/layout/Navbar.jsx - Updated with new color palette
@@ -902,9 +973,9 @@ export const ParticlesBackground = () => {
       id="tsparticles"
       init={particlesInit}
       options={{
-        fullScreen: { enable: true, zIndex: -1 },
+        fullScreen: { enable: true, zIndex: 0 },
         background: { 
-          color: "#0A0A0A"
+          color: "transparent" 
         },
         fpsLimit: 60,
         particles: {
@@ -989,6 +1060,7 @@ createRoot(document.getElementById('root')).render(
 ====== ./src/App.jsx ======
 // src/App.jsx - Compact, animated layout with hero intro + WorkCarousel
 import React, { useEffect, useState } from 'react';
+import { FaGithub, FaLinkedin, FaTwitter, FaBlog } from 'react-icons/fa';
 import ParticlesBackground from './components/layout/ParticlesBackground';
 import Navbar from './components/layout/Navbar';
 import CustomCursor from './components/ui/CustomCursor';
@@ -997,14 +1069,20 @@ import WorkCarousel from './components/sections/WorkCarousel';
 function App() {
   const [showRest, setShowRest] = useState(false);
 
+  // ✅ Social links (later replace with backend values)
+  const githubLink = "https://github.com/CodeBunny09";
+  const linkedinLink = "https://linkedin.com/in/pratik-c";
+  const twitterLink = "https://twitter.com/your-handle";
+  const blogLink = "https://yourblog.com";
+
   useEffect(() => {
     // Delay showing rest until hero lines animate
-    const timer = setTimeout(() => setShowRest(true), 3000); // after 3s
+    const timer = setTimeout(() => setShowRest(true), 480);
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="w-screen min-h-screen bg-bgMain cursor-none relative overflow-y-auto overflow-x-hidden hide-scrollbar">
+    <div className="w-screen min-h-screen cursor-none relative overflow-y-auto overflow-x-hidden hide-scrollbar bg-transparent">
       {/* Custom Cursor */}
       <CustomCursor />
       
@@ -1016,7 +1094,7 @@ function App() {
 
       {/* Hero Section */}
       <section className="relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 py-8 max-w-6xl mx-auto">
-        {/* Left Column - Text + CTA */}
+        {/* Left Column - Text + Socials */}
         <div className="flex-1 text-left flex flex-col items-start">
           <h1 className="text-4xl lg:text-5xl font-bold leading-tight space-y-2">
             <div className="fade-line" style={{ animationDelay: '0.2s' }}>
@@ -1041,17 +1119,28 @@ function App() {
                 building, and the occasional debugging adventure.
               </p>
 
-              {/* CTA Button */}
-              <button 
-                className="px-8 py-3 font-semibold text-bgMain bg-gradient-to-r from-primary to-tertiary rounded-full hover:shadow-lg transition-all duration-300 transform hover:scale-105 text-sm lg:text-base fade-in"
-                style={{
-                  animationDelay: '2.2s',
-                  boxShadow: '0 6px 16px rgba(255, 45, 209, 0.4)',
-                  background: 'linear-gradient(135deg, #FF2DD1, #4DFFBE)',
-                }}
+              {/* ✅ Social Icons */}
+              <div 
+                className="flex space-x-5 mt-2 fade-in"
+                style={{ animationDelay: '2.2s' }}
               >
-                Know More
-              </button>
+                <a href={githubLink} target="_blank" rel="noopener noreferrer" 
+                   className="text-2xl text-gray-300 hover:text-primary transition-transform transform hover:scale-110">
+                  <FaGithub />
+                </a>
+                <a href={linkedinLink} target="_blank" rel="noopener noreferrer" 
+                   className="text-2xl text-gray-300 hover:text-[#0A66C2] transition-transform transform hover:scale-110">
+                  <FaLinkedin />
+                </a>
+                <a href={twitterLink} target="_blank" rel="noopener noreferrer" 
+                   className="text-2xl text-gray-300 hover:text-[#1DA1F2] transition-transform transform hover:scale-110">
+                  <FaTwitter />
+                </a>
+                <a href={blogLink} target="_blank" rel="noopener noreferrer" 
+                   className="text-2xl text-gray-300 hover:text-tertiary transition-transform transform hover:scale-110">
+                  <FaBlog />
+                </a>
+              </div>
             </>
           )}
         </div>
@@ -1078,8 +1167,7 @@ function App() {
         </section>
       )}
 
-      <style jsx>{`
-        /* Floating animation */
+      <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0); }
           50% { transform: translateY(-10px); }
@@ -1088,7 +1176,6 @@ function App() {
           animation: float 4s ease-in-out infinite;
         }
 
-        /* Fade-in animations */
         @keyframes fadeInUp {
           from { opacity: 0; transform: translateY(20px); }
           to { opacity: 1; transform: translateY(0); }
@@ -1105,13 +1192,12 @@ function App() {
           animation: fadeInUp 0.8s forwards;
         }
 
-        /* Hide scrollbar */
         .hide-scrollbar {
-          -ms-overflow-style: none;  /* IE/Edge */
-          scrollbar-width: none;     /* Firefox */
+          -ms-overflow-style: none;
+          scrollbar-width: none;
         }
         .hide-scrollbar::-webkit-scrollbar {
-          display: none;             /* Chrome/Safari */
+          display: none;
         }
       `}</style>
     </div>

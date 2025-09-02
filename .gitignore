@@ -1,0 +1,59 @@
+# === Python / Django ===
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.log
+
+# Virtual environments
+venv/
+.env/
+.env.*  
+.venv/
+
+# SQLite database
+backend/db.sqlite3
+
+# Django media & static files (generated or uploaded)
+backend/media/
+backend/staticfiles/
+static/
+
+# Django settings overrides
+local_settings.py
+
+# === Node / Vite / React ===
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+*.log
+
+# Vite cache
+frontend/.vite/
+.vite/
+
+# Build output
+*.local
+
+# === System / Editor ===
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# === Dependency locks (optional, if managed via lock files) ===
+# Uncomment if you don't want to commit lock files:
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+
+# === Misc ===
+flattened_project.txt
+flatten.sh
