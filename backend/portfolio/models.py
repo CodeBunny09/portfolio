@@ -175,3 +175,16 @@ class BlogPost(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+class ContactPlatform(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    url = models.URLField()
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'title']
+
+    def __str__(self):
+        return self.title

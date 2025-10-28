@@ -3,8 +3,9 @@ from rest_framework import generics, status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .models import Profile, Project, BlogPost
-from .serializers import ProfileSerializer, ProjectSerializer, BlogPostSerializer
+from .models import Profile, Project, BlogPost, ContactPlatform
+from rest_framework import viewsets
+from .serializers import ProfileSerializer, ProjectSerializer, BlogPostSerializer, ContactPlatformSerializer
 from rest_framework.generics import RetrieveAPIView
 
 
@@ -57,3 +58,10 @@ def api_health(request):
         'status': 'healthy',
         'message': 'Portfolio API is running'
     }, status=status.HTTP_200_OK)
+
+
+
+# Contacts Page
+class ContactPlatformViewSet(viewsets.ModelViewSet):
+    queryset = ContactPlatform.objects.all()
+    serializer_class = ContactPlatformSerializer

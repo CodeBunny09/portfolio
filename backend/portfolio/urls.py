@@ -1,8 +1,9 @@
-# backend/portfolio/urls.py
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 from . import views
 
-app_name = 'portfolio'
+router = DefaultRouter()
+router.register(r'contact-platforms', views.ContactPlatformViewSet, basename='contact-platform')
 
 urlpatterns = [
     path('health/', views.api_health, name='health'),
@@ -10,5 +11,5 @@ urlpatterns = [
     path('projects/', views.ProjectListView.as_view(), name='projects'),
     path('projects/<uuid:pk>/', views.ProjectDetailView.as_view(), name='project-detail'),
     path('blog/', views.BlogPostListView.as_view(), name='blog'),
-    path("profile/", views.ProfileView.as_view(), name="profile")
+    path('', include(router.urls)),  
 ]

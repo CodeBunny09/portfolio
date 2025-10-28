@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Profile, SocialLink, Project, TechStack, BlogPost
+from rest_framework import serializers
+from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform
 from django.conf import settings
 
 
@@ -97,3 +98,11 @@ class BlogPostSerializer(serializers.ModelSerializer):
             if request:
                 return request.build_absolute_uri(obj.featured_image.url)
         return None
+
+
+# serializers.py (in your django app)
+
+class ContactPlatformSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactPlatform
+        fields = ['id', 'title', 'description', 'url', 'order']  # Include 'order' if you want it exposed

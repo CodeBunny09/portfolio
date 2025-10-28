@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Profile, SocialLink, Project, TechStack, BlogPost
+from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform
 
 class ProjectAdminForm(forms.ModelForm):
     class Meta:
@@ -83,3 +83,10 @@ class BlogPostAdmin(admin.ModelAdmin):
     list_filter = ['is_published', 'created_at']
     search_fields = ['title', 'content']
     prepopulated_fields = {'slug': ('title',)}
+
+
+@admin.register(ContactPlatform)
+class ContactPlatformAdmin(admin.ModelAdmin):
+    list_display = ['title', 'url', 'order']
+    search_fields = ['title', 'description', 'url']
+    ordering = ['order', 'title']
