@@ -1,23 +1,19 @@
+/* Reset root container for full width, no extra padding */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+/* Remove any demo leftovers and default styles */
+.logo,
+.card,
+.read-the-docs {
+  all: unset;
 }
 
+/* Disable spinning logo demo from Vite template */
 @keyframes logo-spin {
   from {
     transform: rotate(0deg);
@@ -26,30 +22,59 @@
     transform: rotate(360deg);
   }
 }
-
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
+    animation: none !important;
   }
 }
 
-.card {
-  padding: 2em;
+/* Custom portfolio styles (add your own if needed) */
+/* --- None by default --- */
+
+/* Hide scrollbar utility (for overflow sections) */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
-.read-the-docs {
-  color: #888;
+/* Fade-in up animation for hero and section content */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-line {
+  opacity: 0;
+  background: linear-gradient(135deg, #FF2DD1, #63C8FF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: fadeInUp 0.6s forwards;
+  display: block;
+  overflow: visible;
+}
+.fade-in {
+  opacity: 0;
+  animation: fadeInUp 0.8s forwards;
 }
 
-/* src/App.css — remove width cap & extra padding to keep everything compact */
-#root {
-  max-width: none;
-  margin: 0;
-  padding: 0;
-  text-align: left;
+/* Floating profile image animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 4s ease-in-out infinite;
 }
 
-/* (Keep demo leftovers disabled)
-.logo, .card, .read-the-docs { all: unset; }
-*/
+/* Blinking cursor for typewriter effect */
+@keyframes blink {
+  50% { opacity: 0; }
+}
 
+/* Add your custom styling below if needed */
+.btn-gradient:hover {
+  background-image: none !important;
+  background-color: transparent !important;
+}
