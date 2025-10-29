@@ -4,6 +4,7 @@ from . import views
 
 router = DefaultRouter()
 router.register(r'contact-platforms', views.ContactPlatformViewSet, basename='contact-platform')
+router.register(r'gallery', views.GalleryImageViewSet, basename='gallery')
 
 urlpatterns = [
     path('health/', views.api_health, name='health'),

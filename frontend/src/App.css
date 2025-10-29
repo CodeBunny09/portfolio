@@ -78,3 +78,44 @@
   background-image: none !important;
   background-color: transparent !important;
 }
+
+
+.my-masonry-grid {
+  display: flex;
+  margin-left: -28px; /* gutter size offset */
+  width: auto;
+}
+.my-masonry-grid_column {
+  padding-left: 28px; /* gutter size */
+  background-clip: padding-box;
+}
+.my-masonry-grid_column > div {
+  margin-bottom: 28px;
+}
+
+
+
+/* Gallery */
+.da-masonry-grid {
+  display: flex;
+  margin-left: -6px;
+  width: auto;
+}
+.da-masonry-grid_column {
+  padding-left: 6px;
+}
+.da-masonry-grid_column > div {
+  margin-bottom: 6px;
+}
+.da-gallery-img img {
+  width: 100%;
+  display: block;
+  padding: 0;
+  margin: 0;
+  border-radius: 0px;
+  box-shadow: none;
+  background: #181a1b;
+}
+.da-gallery-img .absolute {
+  pointer-events: none;
+}

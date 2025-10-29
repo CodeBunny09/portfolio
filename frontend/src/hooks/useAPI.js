@@ -50,3 +50,78 @@ export function useProfile() {
 
   return { data, loading, error };
 }
+
+
+
+/*xport function useGalleryImages() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/gallery/`)
+      .then(res => {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
+      .then(data => setData(Array.isArray(data) ? data : []))
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+}
+*/
+/*
+export function useGalleryImages() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/gallery/`)
+      .then(res => {
+        if (!res.ok) throw new Error(res.status);
+        return res.json();
+      })
+      .then(data => setData(Array.isArray(data) ? data : []))
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+} */
+
+export function useGalleryImages() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/gallery/`)
+      .then(res => res.json())
+      .then(json => {
+        // support paginated and non-paginated:
+        if (Array.isArray(json)) setData(json);
+        else if ('results' in json && Array.isArray(json.results)) setData(json.results);
+        else setData([]); // fallback
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+}
+
+
+export async function addGalleryLike(id) {
+  return fetch(`${API_BASE_URL}/gallery/${id}/add_like/`, { method: 'POST' });
+}
+
+export async function addGalleryComment(id, text) {
+  return fetch(`${API_BASE_URL}/gallery/${id}/add_comment/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+}

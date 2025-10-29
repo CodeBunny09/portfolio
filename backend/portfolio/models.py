@@ -188,3 +188,29 @@ class ContactPlatform(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class GalleryImage(models.Model):
+    title = models.CharField(max_length=180)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to="gallery/images/")
+    tags = models.CharField(max_length=250, blank=True, help_text="Comma separated")
+    date = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def tag_list(self):
+        return [tag.strip() for tag in self.tags.split(",") if tag.strip()] if self.tags else []
+
+    def __str__(self):
+        return self.title
+
+class GalleryComment(models.Model):
+    image = models.ForeignKey(GalleryImage, related_name="comments", on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    # For anonymous, no user field
+
+class GalleryLike(models.Model):
+    image = models.ForeignKey(GalleryImage, related_name="likes", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # For anonymous, no user field

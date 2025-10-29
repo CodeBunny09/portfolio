@@ -1,6 +1,6 @@
 # backend/portfolio/views.py
-from rest_framework import generics, status
-from rest_framework.decorators import api_view
+from rest_framework import generics, status, viewsets, permissions
+from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Profile, Project, BlogPost, ContactPlatform
@@ -65,3 +65,38 @@ def api_health(request):
 class ContactPlatformViewSet(viewsets.ModelViewSet):
     queryset = ContactPlatform.objects.all()
     serializer_class = ContactPlatformSerializer
+
+
+
+from .models import GalleryImage, GalleryComment, GalleryLike
+from .serializers import GalleryImageSerializer, GalleryCommentSerializer
+
+class GalleryImageViewSet(viewsets.ModelViewSet):
+    queryset = GalleryImage.objects.all().order_by('-date')
+    serializer_class = GalleryImageSerializer
+    permission_classes = [permissions.AllowAny]
+
+    @action(detail=True, methods=['post'])
+    def add_comment(self, request, pk=None):
+        img = self.get_object()
+        text = request.data.get('text')
+        if text:
+            comment = GalleryComment(image=img, text=text)
+            comment.save()
+            return Response(GalleryCommentSerializer(comment).data, status=201)
+        return Response({'error': 'Text required.'}, status=400)
+
+    @action(detail=True, methods=['post'])
+    def add_like(self, request, pk=None):
+        img = self.get_object()
+        like = GalleryLike(image=img)
+        like.save()
+        return Response({'message': 'Like added', 'like_count': img.likes.count()}, status=201)
+
+    @action(detail=True, methods=['get'])
+    def get_meta(self, request, pk=None):
+        img = self.get_object()
+        return Response({
+            'likes': img.likes.count(),
+            'comments': GalleryCommentSerializer(img.comments.all(), many=True).data
+        })

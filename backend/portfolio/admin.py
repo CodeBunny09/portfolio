@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform
+from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike
 
 class ProjectAdminForm(forms.ModelForm):
     class Meta:
@@ -90,3 +90,21 @@ class ContactPlatformAdmin(admin.ModelAdmin):
     list_display = ['title', 'url', 'order']
     search_fields = ['title', 'description', 'url']
     ordering = ['order', 'title']
+
+
+
+
+@admin.register(GalleryImage)
+class GalleryImageAdmin(admin.ModelAdmin):
+    list_display = ['title', 'date', 'image']
+    search_fields = ['title', 'description', 'tags']
+    ordering = ['-date']
+
+@admin.register(GalleryComment)
+class GalleryCommentAdmin(admin.ModelAdmin):
+    list_display = ['image', 'text', 'created_at']
+    search_fields = ['text']
+
+@admin.register(GalleryLike)
+class GalleryLikeAdmin(admin.ModelAdmin):
+    list_display = ['image', 'created_at']

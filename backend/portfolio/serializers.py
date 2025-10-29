@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework import serializers
-from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform
+from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike
 from django.conf import settings
 
 
@@ -106,3 +106,28 @@ class ContactPlatformSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactPlatform
         fields = ['id', 'title', 'description', 'url', 'order']  # Include 'order' if you want it exposed
+
+
+
+
+
+class GalleryCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GalleryComment
+        fields = ['id', 'text', 'created_at']
+
+class GalleryImageSerializer(serializers.ModelSerializer):
+    likes = serializers.SerializerMethodField()
+    comments = GalleryCommentSerializer(many=True, read_only=True)
+    image_url = serializers.ImageField(source='image', read_only=True)
+    tags = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GalleryImage
+        fields = ['id', 'title', 'description', 'image_url', 'tags', 'date', 'created_at', 'likes', 'comments']
+
+    def get_likes(self, obj):
+        return obj.likes.count()
+
+    def get_tags(self, obj):
+        return obj.tag_list()
