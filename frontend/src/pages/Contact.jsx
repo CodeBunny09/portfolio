@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '../components/layout/Navbar';
 import ParticlesBackground from '../components/layout/ParticlesBackground';
 import CustomCursor from '../components/ui/CustomCursor';
+import { useContactPlatforms } from '../hooks/useAPI';
+
 import '../App.css';
 
 const Contact = () => {
-  const [contacts, setContacts] = useState([]);
+  /*const [contacts, setContacts] = useState([]);
 
     useEffect(() => {
     fetch('/api/contact-platforms/')
@@ -13,7 +15,10 @@ const Contact = () => {
         .then(data => {
         setContacts(data.results); // Fix: assign the actual array!
         });
-    }, []);
+    }, []); */
+
+
+const { data: contacts, loading, error } = useContactPlatforms();
 
 
   return (

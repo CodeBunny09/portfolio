@@ -5,6 +5,7 @@ import Navbar from "../components/layout/Navbar";
 import ParticlesBackground from "../components/layout/ParticlesBackground";
 import CustomCursor from "../components/ui/CustomCursor";
 import ModalPost from "../components/gallery/ModalPost";
+import ScrollToTopButton from "../components/ui/ScrollToTopButton";
 import "../App.css";
 
 const breakpointColumnsObj = {
@@ -16,7 +17,7 @@ const breakpointColumnsObj = {
   600: 1,
 };
 
-function ScrollToTopButton({ visible }) {
+/*function ScrollToTopButton({ visible }) {
   return (
     <button
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
@@ -41,7 +42,7 @@ function ScrollToTopButton({ visible }) {
       ↑
     </button>
   );
-}
+} */
 
 const truncate = (text, len = 42) => (text.length > len ? text.substr(0, len - 1) + "…" : text);
 const isMobile = () => typeof window !== "undefined" && window.innerWidth < 700;
@@ -83,7 +84,7 @@ const Gallery = () => {
   const showCursor = !isMobile();
 
   return (
-    <div className="w-screen min-h-screen relative overflow-x-hidden bg-[#181a1b]">
+    <div className="w-screen min-h-screen relative overflow-x-hidden">
       <ParticlesBackground />
       {showCursor && <CustomCursor />}
       <div

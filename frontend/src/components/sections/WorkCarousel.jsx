@@ -2,29 +2,24 @@ import React, { useMemo } from 'react';
 import { useFeaturedProjects } from '../../hooks/useAPI';
 import defaultProjectImage from '../../assets/default-project.jpg';
 
-const WorkCarousel = ({ compact = false }) => {
-  const { data: projectsData, loading, error } = useFeaturedProjects(10);
+const WorkCarousel = ({ compact = false, projectsData }) => {
+  // Fallback to hook if props not provided
+  const { data: fetchedData, loading, error } = useFeaturedProjects(10);
 
   const projects = useMemo(() => {
-    if (!projectsData) return [];
-    if (Array.isArray(projectsData)) return projectsData;
-    if (projectsData.results && Array.isArray(projectsData.results)) return projectsData.results;
+    const data = projectsData || fetchedData;
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (data.results && Array.isArray(data.results)) return data.results;
     return [];
-  }, [projectsData]);
+  }, [projectsData, fetchedData]);
 
-  if (loading) return <div className="text-gray-400 text-center py-8">Loading projects...</div>;
-  if (error) return <div className="text-red-500 text-center py-8">Failed to load projects.</div>;
+  if (!projectsData && loading) return <div className="text-gray-400 text-center py-8">Loading projects...</div>;
+  if (!projectsData && error) return <div className="text-red-500 text-center py-8">Failed to load projects.</div>;
 
   return (
     <section className={`relative z-10 ${compact ? 'py-4' : 'py-12'}`}>
-      <div className="max-w-7xl mx-auto px-4">
-        <div className="text-center mb-6 lg:mb-8">
-          <h2 className="text-3xl lg:text-4xl text-white font-bold mb-1">Featured Work</h2>
-          <p className="text-gray-400 text-sm lg:text-base">
-            A showcase of innovative projects with key details
-          </p>
-        </div>
-
+      <div className="w-full px-3 md:px-6">
         <div
           className="flex overflow-x-auto space-x-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent pb-4"
           style={{ scrollSnapType: 'x mandatory' }}
@@ -38,23 +33,17 @@ const WorkCarousel = ({ compact = false }) => {
               {/* Banner Image */}
               <div
                 className="h-48 opacity-70 hover:opacity-100 transition-opacity duration-300 ease-in-out rounded-t-2xl bg-cover bg-center"
-                style={{
-                  backgroundImage: `url(${project.image || defaultProjectImage})`,
-                }}
+                style={{ backgroundImage: `url(${project.image || defaultProjectImage})` }}
               >
                 <div className="w-full h-full bg-black/40 rounded-t-2xl"></div>
               </div>
-
               {/* Card Content */}
               <div className="p-4 space-y-3">
                 <h3 className="text-lg font-bold text-white">{project.title}</h3>
                 <p className="text-gray-300 text-sm">{project.description}</p>
-
                 <div className="text-xs text-gray-400">
                   <p><span className="text-gray-200">Type:</span> {project.type || 'N/A'}</p>
                 </div>
-
-                {/* Tech Stack */}
                 {project.tech_stack?.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {project.tech_stack.slice(0, 5).map((tech) => (
@@ -67,8 +56,6 @@ const WorkCarousel = ({ compact = false }) => {
                     ))}
                   </div>
                 )}
-
-                {/* Corrected Stats */}
                 <div className="flex flex-wrap gap-3 text-xs text-gray-400">
                   {project.type === 'github' && (
                     <>
@@ -83,8 +70,6 @@ const WorkCarousel = ({ compact = false }) => {
                     </>
                   )}
                 </div>
-
-                {/* View Button */}
                 {project.link && (
                   <a
                     href={project.link}

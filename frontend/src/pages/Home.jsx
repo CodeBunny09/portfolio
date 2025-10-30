@@ -184,6 +184,37 @@ function Home() {
       {showRest && (
         <section className="relative z-10 px-4 py-8 max-w-6xl mx-auto fade-in" style={{ animationDelay: '2.8s' }}>
           <WorkCarousel compact />
+          {showRest && (
+  <section className="w-full flex justify-center items-center mt-2 mb-8 fade-in" style={{ animationDelay: '2.9s' }}>
+    <button
+      className="
+        px-10 py-4 rounded-full
+        backdrop-blur-md
+        border border-white/20
+        shadow-lg
+        text-white text-xl font-bold
+        transition-all duration-400
+        hover:scale-105
+        hover:shadow-xl
+        hover:backdrop-blur-xl
+        hover:bg-transparent
+        hover:border-white
+        hover:text-white
+      "
+      style={{
+        letterSpacing: '1px',
+        boxShadow: "0 6px 40px 0 rgba(68,0,188,0.05)",
+        textShadow: "0 0 10px #fff5",
+        WebkitBackdropFilter: "blur(8px)",
+        backdropFilter: "blur(8px)",
+      }}
+      onClick={() => navigate('/work')}
+    >
+      Explore All My Work
+    </button>
+  </section>
+)}
+
         </section>
       )}
       <style>{`
