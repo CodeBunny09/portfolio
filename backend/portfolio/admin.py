@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike
+from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike, Resume
 
 class ProjectAdminForm(forms.ModelForm):
     class Meta:
@@ -108,3 +108,9 @@ class GalleryCommentAdmin(admin.ModelAdmin):
 @admin.register(GalleryLike)
 class GalleryLikeAdmin(admin.ModelAdmin):
     list_display = ['image', 'created_at']
+
+
+
+@admin.register(Resume)
+class ResumeAdmin(admin.ModelAdmin):
+    list_display = ['title', 'file', 'uploaded_at']

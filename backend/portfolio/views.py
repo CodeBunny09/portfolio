@@ -3,9 +3,9 @@ from rest_framework import generics, status, viewsets, permissions
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .models import Profile, Project, BlogPost, ContactPlatform
+from .models import Profile, Project, BlogPost, ContactPlatform, Resume
 from rest_framework import viewsets
-from .serializers import ProfileSerializer, ProjectSerializer, BlogPostSerializer, ContactPlatformSerializer
+from .serializers import ProfileSerializer, ProjectSerializer, BlogPostSerializer, ContactPlatformSerializer, ResumeSerializer
 from rest_framework.generics import RetrieveAPIView
 
 
@@ -100,3 +100,9 @@ class GalleryImageViewSet(viewsets.ModelViewSet):
             'likes': img.likes.count(),
             'comments': GalleryCommentSerializer(img.comments.all(), many=True).data
         })
+    
+
+class ResumeListView(generics.ListAPIView):
+    queryset = Resume.objects.order_by('-uploaded_at')
+    serializer_class = ResumeSerializer
+    permission_classes = [permissions.AllowAny]

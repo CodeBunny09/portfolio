@@ -133,3 +133,24 @@ export function useAllProjects({ page = 1, page_size = 18 } = {}) {
   }, [page, page_size]);
   return { data, loading, error };
 }
+
+
+export function useResume() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/resume/")
+      .then(res => res.json())
+      .then(json => {
+        // Handles paginated (results) or plain array
+        if ("results" in json) setData(json.results);
+        else setData(json); // fallback if needed
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+}

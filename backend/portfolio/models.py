@@ -214,3 +214,12 @@ class GalleryLike(models.Model):
     image = models.ForeignKey(GalleryImage, related_name="likes", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     # For anonymous, no user field
+
+
+class Resume(models.Model):
+    title = models.CharField(max_length=120, default="Resume")
+    file = models.FileField(upload_to="resume/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title

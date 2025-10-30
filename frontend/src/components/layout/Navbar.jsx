@@ -70,7 +70,22 @@ export const Navbar = () => {
         ></span>
       </Link>
     );
-  } else {
+  } else if (link === "Resume") {
+      return (
+        <Link
+          key={link}
+          to="/resume"
+          className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+          style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+        >
+          {link}
+          <span
+            className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+            style={{ background: "#FFD600" }}
+          ></span>
+        </Link>
+      );
+    } else {
     return (
       <a
         key={link}

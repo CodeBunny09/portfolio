@@ -11,7 +11,7 @@ import { useFeaturedProjects, useAllProjects } from '../hooks/useAPI';
 const breakpointColumnsObj = {
   default: 5,
   1800: 5,
-  1500: 4,
+  1500: 5,
   1200: 4,
   900: 3,
   600: 2,

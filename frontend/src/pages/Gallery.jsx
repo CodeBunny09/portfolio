@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useGalleryImages } from "../hooks/useAPI";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { addGalleryLike, addGalleryComment } from "../hooks/useAPI";
 import Masonry from "react-masonry-css";
 import Navbar from "../components/layout/Navbar";
 import ParticlesBackground from "../components/layout/ParticlesBackground";
@@ -17,46 +17,81 @@ const breakpointColumnsObj = {
   600: 1,
 };
 
-/*function ScrollToTopButton({ visible }) {
-  return (
-    <button
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-      className={`
-        fixed bottom-6 right-5 z-50
-        px-4 py-3
-        bg-white/80 hover:bg-white transition
-        rounded-full shadow-lg
-        backdrop-blur
-        text-black text-xl
-        flex items-center justify-center
-        ${visible ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}
-        transition-opacity duration-400
-      `}
-      aria-label="Scroll to top"
-      style={{
-        boxShadow: "0 2px 12px 0 #0003",
-        fontSize: 24,
-        fontWeight: 700,
-      }}
-    >
-      ↑
-    </button>
-  );
-} */
+const truncate = (text, len = 42) =>
+  text.length > len ? text.substr(0, len - 1) + "…" : text;
+const isMobile = () =>
+  typeof window !== "undefined" && window.innerWidth < 700;
 
-const truncate = (text, len = 42) => (text.length > len ? text.substr(0, len - 1) + "…" : text);
-const isMobile = () => typeof window !== "undefined" && window.innerWidth < 700;
+const API_BASE_URL = "http://127.0.0.1:8000/api";
 
 const Gallery = () => {
-  const { data: images, loading } = useGalleryImages();
+  // --- Infinite Scroll: Gallery State ---
+  const [images, setImages] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(1);
+
+  // Modal and UI
   const [hideIds, setHideIds] = useState([]);
   const [modalPost, setModalPost] = useState(null);
   const [focusIds, setFocusIds] = useState([]);
   const imgRefs = useRef([]);
   const [scrolled, setScrolled] = useState(false);
   const heroRef = useRef(null);
-
   const [mobile, setMobile] = useState(isMobile());
+
+  // On initial mount, fetch page 1
+  useEffect(() => {
+    setLoading(true);
+    fetch(`${API_BASE_URL}/gallery/?page=1&page_size=18`)
+      .then((res) => res.json())
+      .then((json) => {
+        let items = Array.isArray(json)
+          ? json
+          : json && json.results
+          ? json.results
+          : [];
+        setImages(items);
+        setHasMore(json.next !== null && items.length > 0);
+        setPage(2); // Next page to fetch
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, []);
+
+  // Infinite scroll: fetch next page if near bottom
+  useEffect(() => {
+    const onScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+          document.documentElement.offsetHeight - 350 &&
+        hasMore &&
+        !loading
+      ) {
+        setLoading(true);
+        fetch(`${API_BASE_URL}/gallery/?page=${page}&page_size=18`)
+          .then((res) => res.json())
+          .then((json) => {
+            let items = Array.isArray(json)
+              ? json
+              : json && json.results
+              ? json.results
+              : [];
+            setImages((prev) => [...prev, ...items]);
+            setHasMore(json.next !== null && items.length > 0);
+            setPage((prev) => prev + 1);
+            setLoading(false);
+          })
+          .catch(() => setLoading(false));
+      }
+      if (!heroRef.current) return;
+      const heroBottom = heroRef.current.getBoundingClientRect().bottom;
+      setScrolled(heroBottom <= 0);
+    };
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [hasMore, loading, page]);
+
   useEffect(() => {
     const handleResize = () => setMobile(isMobile());
     window.addEventListener("resize", handleResize);
@@ -65,23 +100,51 @@ const Gallery = () => {
 
   useEffect(() => {
     if (mobile) {
-      setFocusIds(images.map(img => img.id));
+      setFocusIds(images.map((img) => img.id));
     } else {
       setFocusIds([]);
     }
   }, [mobile, images.length]);
 
-  useEffect(() => {
-    const onScroll = () => {
-      if (!heroRef.current) return;
-      const heroBottom = heroRef.current.getBoundingClientRect().bottom;
-      setScrolled(heroBottom <= 0);
-    };
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   const showCursor = !isMobile();
+
+  // PATCH image in array after comment/like
+  const updateImageInGallery = useCallback(
+    (updatedImage) => {
+      setImages((prev) =>
+        prev.map((img) => (img.id === updatedImage.id ? updatedImage : img))
+      );
+      setModalPost(updatedImage); // Update for active modal too
+    },
+    [setImages, setModalPost]
+  );
+
+  // On modal like/comment: fetch updated image and patch array and modal
+  const handleLike = async (imgId) => {
+    await addGalleryLike(imgId);
+    fetch(`${API_BASE_URL}/gallery/${imgId}/`)
+      .then((res) => res.json())
+      .then(updateImageInGallery);
+  };
+
+  const handleComment = async (imgId, text) => {
+    await addGalleryComment(imgId, text);
+    fetch(`${API_BASE_URL}/gallery/${imgId}/`)
+      .then((res) => res.json())
+      .then(updateImageInGallery);
+  };
+
+  // --- Always open modal with latest data from API ---
+  const handleOpenModal = async (img) => {
+    setModalPost(null); // Optionally add a loader state for skeleton
+    const res = await fetch(`${API_BASE_URL}/gallery/${img.id}/`);
+    const latest = await res.json();
+    setModalPost(latest);
+    // Optionally, also patch images array for consistency:
+    setImages((prev) =>
+      prev.map((item) => (item.id === img.id ? latest : item))
+    );
+  };
 
   return (
     <div className="w-screen min-h-screen relative overflow-x-hidden">
@@ -101,7 +164,7 @@ const Gallery = () => {
         style={{
           background: "rgba(24,26,27,0)",
           backdropFilter: "blur(3px)",
-          minHeight: "54px"
+          minHeight: "54px",
         }}
       >
         <h1
@@ -111,7 +174,7 @@ const Gallery = () => {
             fontWeight: 600,
             letterSpacing: "0.04em",
             margin: "0.5em 0",
-            color: "#fff"
+            color: "#fff",
           }}
         >
           MY PHOTO GALLERY
@@ -132,7 +195,7 @@ const Gallery = () => {
               letterSpacing: "0.1px",
               marginTop: "0",
               lineHeight: "1.1",
-              fontWeight: 600
+              fontWeight: 600,
             }}
           >
             MY PHOTO GALLERY
@@ -143,53 +206,53 @@ const Gallery = () => {
           className="da-masonry-grid"
           columnClassName="da-masonry-grid_column"
         >
-          {(images || []).map((img, idx) =>
-            !img.image_url || hideIds.includes(img.id)
-              ? null
-              : (
+          {(images || []).map(
+            (img, idx) =>
+              img.image_url && !hideIds.includes(img.id) && (
                 <div
                   key={img.id}
                   className="da-gallery-img group w-full relative overflow-hidden cursor-pointer"
                   style={{ marginBottom: "6px" }}
-                  onClick={() => setModalPost(img)}
+                  onClick={() => handleOpenModal(img)}
                 >
                   <img
-                    ref={el => (imgRefs.current[idx] = el)}
+                    ref={(el) => (imgRefs.current[idx] = el)}
                     src={img.image_url}
                     alt={img.title}
                     data-id={img.id}
-                    onError={() => setHideIds(ids => [...ids, img.id])}
+                    onError={() => setHideIds((ids) => [...ids, img.id])}
                     className="w-full h-auto block transition duration-500 group-hover:brightness-75"
                     style={{
                       borderRadius: "0px",
-                      background: "#181a1b"
+                      background: "#181a1b",
                     }}
                     draggable={false}
                   />
                   <div
                     className={
                       "absolute left-0 bottom-0 w-full transition-opacity duration-500 z-20 pointer-events-none " +
-                      (
-                        mobile
-                          ? (focusIds.includes(img.id) ? "opacity-100" : "opacity-0")
-                          : "group-hover:opacity-100 opacity-0"
-                      )
+                      (mobile
+                        ? focusIds.includes(img.id)
+                          ? "opacity-100"
+                          : "opacity-0"
+                        : "group-hover:opacity-100 opacity-0")
                     }
                     style={{
                       padding: "0.7em 1em",
-                      minHeight: "54px"
+                      minHeight: "54px",
                     }}
                   >
-                    <div className="text-white font-semibold text-lg" style={{ letterSpacing: "0.01em" }}>
+                    <div
+                      className="text-white font-semibold text-lg"
+                      style={{ letterSpacing: "0.01em" }}
+                    >
                       {img.title}
                     </div>
                     <div className="text-white/80 text-sm mb-1">
                       {truncate(img.description, 56)}
                     </div>
                     <div className="flex flex-wrap gap-2 items-center text-xs">
-                      <span className="mr-2 text-pink-400">
-                        ♥ {img.likes}
-                      </span>
+                      <span className="mr-2 text-pink-400">♥ {img.likes}</span>
                       <span className="mr-2 text-blue-300">
                         💬 {img.comments.length}
                       </span>
@@ -217,6 +280,8 @@ const Gallery = () => {
         likeCount={modalPost ? modalPost.likes : 0}
         commentCount={modalPost ? modalPost.comments.length : 0}
         comments={modalPost ? modalPost.comments : []}
+        onLike={() => modalPost && handleLike(modalPost.id)}
+        onComment={(text) => modalPost && handleComment(modalPost.id, text)}
       />
       <ScrollToTopButton visible={scrolled} />
     </div>

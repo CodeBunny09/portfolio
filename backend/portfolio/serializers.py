@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from rest_framework import serializers
-from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike
+from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike, Resume
 from django.conf import settings
 
 
@@ -131,3 +131,16 @@ class GalleryImageSerializer(serializers.ModelSerializer):
 
     def get_tags(self, obj):
         return obj.tag_list()
+
+
+
+class ResumeSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Resume
+        fields = ['id', 'title', 'file_url', 'uploaded_at']
+
+    def get_file_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.file.url) if request else obj.file.url
