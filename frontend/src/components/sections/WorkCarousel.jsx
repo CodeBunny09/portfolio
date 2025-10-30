@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFeaturedProjects } from '../../hooks/useAPI';
 import defaultProjectImage from '../../assets/default-project.jpg';
 
 const WorkCarousel = ({ compact = false, projectsData }) => {
-  // Fallback to hook if props not provided
   const { data: fetchedData, loading, error } = useFeaturedProjects(10);
+  const carouselRef = useRef(null);
 
   const projects = useMemo(() => {
     const data = projectsData || fetchedData;
@@ -14,14 +14,31 @@ const WorkCarousel = ({ compact = false, projectsData }) => {
     return [];
   }, [projectsData, fetchedData]);
 
+  const scroll = (offset) => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
+
   if (!projectsData && loading) return <div className="text-gray-400 text-center py-8">Loading projects...</div>;
   if (!projectsData && error) return <div className="text-red-500 text-center py-8">Failed to load projects.</div>;
 
   return (
-    <section className={`relative z-10 ${compact ? 'py-4' : 'py-12'}`}>
-      <div className="w-full px-3 md:px-6">
+    <section className={`relative z-10 ${compact ? 'py-4' : 'py-12'} w-full`}>
+      <div className="relative w-full px-0">
+        {/* Minimalistic left arrow */}
+        <button
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/40 hover:bg-white/70 rounded-full shadow transition focus:outline-none"
+          onClick={() => scroll(-350)}
+          aria-label="Scroll Left"
+          type="button"
+        >
+          <span className="text-lg font-bold text-gray-800">&lt;</span>
+        </button>
+        {/* Carousel */}
         <div
-          className="flex overflow-x-auto space-x-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent pb-4"
+          ref={carouselRef}
+          className="flex overflow-x-auto space-x-6 pb-4 w-full scroll-smooth no-scrollbar"
           style={{ scrollSnapType: 'x mandatory' }}
         >
           {projects.map((project) => (
@@ -84,6 +101,15 @@ const WorkCarousel = ({ compact = false, projectsData }) => {
             </div>
           ))}
         </div>
+        {/* Minimalistic right arrow */}
+        <button
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-20 p-1 bg-white/40 hover:bg-white/70 rounded-full shadow transition focus:outline-none"
+          onClick={() => scroll(350)}
+          aria-label="Scroll Right"
+          type="button"
+        >
+          <span className="text-lg font-bold text-gray-800">&gt;</span>
+        </button>
       </div>
     </section>
   );

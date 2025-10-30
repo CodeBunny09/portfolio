@@ -5,14 +5,14 @@ import ParticlesBackground from '../components/layout/ParticlesBackground';
 import Navbar from '../components/layout/Navbar';
 import CustomCursor from '../components/ui/CustomCursor';
 import WorkCarousel from '../components/sections/WorkCarousel';
-import { useProfile } from '../hooks/useAPI';
+import { useProfile, useGalleryImages } from '../hooks/useAPI';
 import { useNavigate } from "react-router-dom";
-
 import '../App.css';
 
 function Home() {
   const [showRest, setShowRest] = useState(false);
   const { data: profile, loading, error } = useProfile();
+  const { data: galleryImages, loading: galleryLoading, error: galleryError } = useGalleryImages();
 
   // ---- Typewriter state ----
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
@@ -26,20 +26,17 @@ function Home() {
   );
 
   useEffect(() => {
-    const timer = setTimeout(() => setShowRest(true), 480);
+    const timer = setTimeout(() => setShowRest(true), 10);
     return () => clearTimeout(timer);
   }, []);
 
   const ParticlesMemo = useMemo(() => <ParticlesBackground />, []);
   useEffect(() => {
     if (taglineParts.length === 0) return;
-
     const currentWord = taglineParts[currentWordIndex];
     const typingSpeed = isDeleting ? 60 : 110;
     const pauseAfterTyped = 900;
-
     let timeoutId;
-
     const tick = () => {
       if (!isDeleting && displayedText.length < currentWord.length) {
         setDisplayedText(currentWord.slice(0, displayedText.length + 1));
@@ -52,9 +49,7 @@ function Home() {
         setCurrentWordIndex((prev) => (prev + 1) % taglineParts.length);
       }
     };
-
     if (!timeoutId) timeoutId = setTimeout(tick, typingSpeed);
-
     return () => clearTimeout(timeoutId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [displayedText, isDeleting, currentWordIndex, taglineParts.length]);
@@ -67,7 +62,6 @@ function Home() {
   }
 
   const navigate = useNavigate();
-
 
   return (
     <div className="w-screen min-h-screen cursor-none relative overflow-y-auto overflow-x-hidden hide-scrollbar bg-transparent">
@@ -82,7 +76,6 @@ function Home() {
             <div className="fade-line" style={{ animationDelay: '0.2s' }}>
               Hi, I'm {profile?.name || 'Pratik'}
             </div>
-            {/* Typewriter tagline — larger than the hi text */}
             {taglineParts.length > 0 && (
               <div
                 className="fade-line tagline text-[2.6rem] lg:text-[3.2rem] font-extrabold"
@@ -101,7 +94,6 @@ function Home() {
               >
                 {profile?.bio || "I'm a developer and analyst who loves turning tricky problems into clever solutions—whether it's models, dashboards, or full-on experiments. I thrive on learning, building, and the occasional debugging adventure."}
               </p>
-              {/* Social Icons */}
               <div className="flex space-x-5 mt-2 fade-in" style={{ animationDelay: '2.2s' }}>
                 {socials.github && (
                   <a href={socials.github} target="_blank" rel="noopener noreferrer" className="text-2xl text-gray-300 hover:text-primary transition-transform transform hover:scale-110">
@@ -145,10 +137,9 @@ function Home() {
         )}
       </section>
       {/* CTA Section */}
-      {/* CTA Button Section - horizontally below hero */}
-    {showRest && (
-    <section className="w-full flex justify-center items-center mt-2 mb-8 fade-in" style={{ animationDelay: '2.3s' }}>
-        <button
+      {showRest && (
+        <section className="w-full flex justify-center items-center mt-2 mb-8 fade-in" style={{ animationDelay: '2.3s' }}>
+          <button
             className="
               px-10 py-4 rounded-full
               backdrop-blur-md
@@ -164,59 +155,137 @@ function Home() {
               hover:text-white
             "
             style={{
-            letterSpacing: '1px',
-            boxShadow: "0 6px 40px 0 rgba(68,0,188,0.05)",
-            textShadow: "0 0 10px #fff5",
-            WebkitBackdropFilter: "blur(8px)",
-            backdropFilter: "blur(8px)"
+              letterSpacing: '1px',
+              boxShadow: "0 6px 40px 0 rgba(68,0,188,0.05)",
+              textShadow: "0 0 10px #fff5",
+              WebkitBackdropFilter: "blur(8px)",
+              backdropFilter: "blur(8px)"
             }}
             onClick={() => navigate('/contact')}
-        >
+          >
             Request a custom solution
-        </button>
-    </section>
-
-)}
-
-
+          </button>
+        </section>
+      )}
+      {/* --- Works Header --- */}
+      {showRest && (
+        <section className="relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 py-8 max-w-6xl mx-auto overflow-visible" style={{ animationDelay: '2.4s' }}>
+          <h2 className="text-3xl font-bold text-white text-left" style={{ marginBottom: 0 }}>My Works</h2>
+        </section>
+      )}
 
       {/* Work Carousel Section */}
       {showRest && (
         <section className="relative z-10 px-4 py-8 max-w-6xl mx-auto fade-in" style={{ animationDelay: '2.8s' }}>
           <WorkCarousel compact />
-          {showRest && (
-  <section className="w-full flex justify-center items-center mt-2 mb-8 fade-in" style={{ animationDelay: '2.9s' }}>
-    <button
-      className="
-        px-10 py-4 rounded-full
-        backdrop-blur-md
-        border border-white/20
-        shadow-lg
-        text-white text-xl font-bold
-        transition-all duration-400
-        hover:scale-105
-        hover:shadow-xl
-        hover:backdrop-blur-xl
-        hover:bg-transparent
-        hover:border-white
-        hover:text-white
-      "
-      style={{
-        letterSpacing: '1px',
-        boxShadow: "0 6px 40px 0 rgba(68,0,188,0.05)",
-        textShadow: "0 0 10px #fff5",
-        WebkitBackdropFilter: "blur(8px)",
-        backdropFilter: "blur(8px)",
-      }}
-      onClick={() => navigate('/work')}
-    >
-      Explore All My Work
-    </button>
-  </section>
-)}
-
+          <section className="w-full flex justify-center items-center mt-2 mb-8 fade-in" style={{ animationDelay: '2.9s' }}>
+            <button
+              className="
+                px-10 py-4 rounded-full
+                backdrop-blur-md
+                border border-white/20
+                shadow-lg
+                text-white text-xl font-bold
+                transition-all duration-400
+                hover:scale-105
+                hover:shadow-xl
+                hover:backdrop-blur-xl
+                hover:bg-transparent
+                hover:border-white
+                hover:text-white
+              "
+              style={{
+                letterSpacing: '1px',
+                boxShadow: "0 6px 40px 0 rgba(68,0,188,0.05)",
+                textShadow: "0 0 10px #fff5",
+                WebkitBackdropFilter: "blur(8px)",
+                backdropFilter: "blur(8px)",
+              }}
+              onClick={() => navigate('/work')}
+              >
+              Explore All My Work
+            </button>
+          </section>
         </section>
       )}
+
+      {/* --- Gallery Header --- */}
+         {showRest && (
+           <section className="relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 py-8 max-w-6xl mx-auto overflow-visible" style={{ animationDelay: '2.4s' }}>
+             <h2 className="text-3xl font-bold text-white text-left" style={{ marginBottom: 0 }}>My Gallery</h2>
+           </section>
+         )}
+
+      {/* --- Gallery Preview Section (from API) --- */}
+      {showRest && (
+        <section className="w-full flex justify-center items-center overflow-hidden py-4 mb-2 fade-in" style={{ animationDelay: '2.5s' }}>
+          {galleryLoading ? (
+            <div className="w-full text-center text-gray-400">Loading gallery...</div>
+          ) : galleryError ? (
+            <div className="w-full text-center text-red-400">Gallery failed to load</div>
+          ) : (
+            <div className="flex w-full gap-3" style={{ height: 176, overflow: 'hidden' }}>
+              {galleryImages.slice(0, 5).map((img, i) => (
+                <img
+                key={img.id || i}
+                src={img.image || img.url || img.image_url}
+                alt={img.title || `preview-${i}`}
+                className="object-cover rounded-lg shadow-md"
+                style={{ height: 176, width: "100%", flex: 1 }}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      )}
+      {/* --- CTA to View Gallery --- */}
+      {showRest && (
+        <section className="w-full flex justify-center items-center mb-6 fade-in" style={{ animationDelay: '2.6s' }}>
+          <button
+            className="px-7 py-3 rounded-full bg-white/10 border border-white/25 text-white font-medium text-lg shadow-md hover:scale-105 transition"
+            onClick={() => navigate('/gallery')}
+            >
+            View Full Gallery
+          </button>
+        </section>
+      )}
+      
+      {/* ---- Contact Mail Form ---- */}
+      {showRest && (
+        <section className="w-full flex flex-col items-center my-8 fade-in" style={{ animationDelay: '3s' }}>
+          <h2 className="text-3xl font-bold text-white text-left" style={{ marginBottom: 0 }}>Contact Me</h2>
+          <form
+            className="w-full max-w-lg bg-black/20 p-6 rounded-lg shadow"
+            onSubmit={e => {
+              e.preventDefault();
+              const name = e.target.name.value;
+              const email = e.target.email.value;
+              const message = e.target.message.value;
+              window.location = `mailto:pratikisawesom3@gmail.com?subject=Contact from ${encodeURIComponent(name)}&body=${encodeURIComponent(message + "\n\nEmail: " + email)}`;
+            }}
+          >
+            <h3 className="text-2xl font-bold text-white mb-4">Contact Me</h3>
+            <input name="name" type="text" required placeholder="Your name" className="w-full px-4 py-2 rounded mb-3 bg-black/15 text-white border border-white/20 focus:outline-none" />
+            <input name="email" type="email" required placeholder="Your email" className="w-full px-4 py-2 rounded mb-3 bg-black/15 text-white border border-white/20 focus:outline-none" />
+            <textarea name="message" required placeholder="Your message" rows={4} className="w-full px-4 py-2 rounded mb-3 bg-black/15 text-white border border-white/20 focus:outline-none" />
+            <button type="submit" className="w-full px-6 py-2 rounded-full bg-primary text-white font-semibold shadow hover:scale-105 transition duration-150">
+              Send via Email
+            </button>
+          </form>
+        </section>
+      )}
+      {/* ---- Contact Me CTA ---- */}
+      {showRest && (
+        <section className="w-full flex justify-center items-center mt-4 mb-12 fade-in" style={{ animationDelay: '3.1s' }}>
+          <button
+            className="px-10 py-4 rounded-full bg-gradient-to-r from-[#FF2DD1] to-[#63C8FF] text-white text-xl font-bold shadow-lg hover:scale-105 transition"
+            onClick={() => navigate('/contact')}
+          >
+            Contact Me Directly
+          </button>
+        </section>
+      )}
+      {/* Styles */}
       <style>{`
         @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
         .animate-float { animation: float 4s ease-in-out infinite; }
