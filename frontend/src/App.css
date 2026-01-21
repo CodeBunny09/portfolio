@@ -119,7 +119,3 @@
 .da-gallery-img .absolute {
   pointer-events: none;
 }
-
-
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }

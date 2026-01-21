@@ -6,8 +6,7 @@ import { Link } from "react-router-dom";
 export const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
 
-  // Remove "Blog" from navLinks
-  const navLinks = ["Work", "Gallery", "Resume", "Contact"];
+  const navLinks = ["Work", "Gallery", "Blog", "Resume", "Contact"];
 
   return (
     <>
@@ -29,82 +28,83 @@ export const Navbar = () => {
           {/* Desktop Menu */}
           <div className="hidden md:flex space-x-10">
             {navLinks.map((link, index) => {
-              if (link === "Contact") {
-                return (
-                  <Link
-                    key={link}
-                    to="/contact"
-                    className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
-                    style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
-                  >
-                    {link}
-                    <span className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
-                      style={{ background: "#4DFFBE" }}
-                    ></span>
-                  </Link>
-                );
-              } else if (link === "Gallery") {
-                return (
-                  <Link
-                    key={link}
-                    to="/gallery"
-                    className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
-                    style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
-                  >
-                    {link}
-                    <span className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
-                      style={{ background: "#FF2DD1" }}
-                    ></span>
-                  </Link>
-                );
-              } else if (link === "Work") {
-                return (
-                  <Link
-                    key={link}
-                    to="/work"
-                    className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
-                    style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
-                  >
-                    {link}
-                    <span className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
-                      style={{ background: "#00B2FF" }}
-                    ></span>
-                  </Link>
-                );
-              } else if (link === "Resume") {
-                return (
-                  <Link
-                    key={link}
-                    to="/resume"
-                    className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
-                    style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
-                  >
-                    {link}
-                    <span
-                      className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
-                      style={{ background: "#FFD600" }}
-                    ></span>
-                  </Link>
-                );
-              } else {
-                return (
-                  <a
-                    key={link}
-                    href="#"
-                    className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
-                    style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
-                  >
-                    {link}
-                    <span
-                      className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
-                      style={{
-                        background: index % 2 === 0 ? "#FF2DD1" : "#4DFFBE",
-                      }}
-                    ></span>
-                  </a>
-                );
-              }
-            })}
+  if (link === "Contact") {
+    return (
+      <Link
+        key={link}
+        to="/contact"
+        className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+        style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+      >
+        {link}
+        <span className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+          style={{ background: "#4DFFBE" }}
+        ></span>
+      </Link>
+    );
+  } else if (link === "Gallery") {
+    return (
+      <Link
+        key={link}
+        to="/gallery"
+        className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+        style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+      >
+        {link}
+        <span className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+          style={{ background: "#FF2DD1" }}
+        ></span>
+      </Link>
+    );
+  } else if (link === "Work") {
+    return (
+      <Link
+        key={link}
+        to="/work"
+        className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+        style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+      >
+        {link}
+        <span className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+          style={{ background: "#00B2FF" }} // Change color if desired
+        ></span>
+      </Link>
+    );
+  } else if (link === "Resume") {
+      return (
+        <Link
+          key={link}
+          to="/resume"
+          className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+          style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+        >
+          {link}
+          <span
+            className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+            style={{ background: "#FFD600" }}
+          ></span>
+        </Link>
+      );
+    } else {
+    return (
+      <a
+        key={link}
+        href="#"
+        className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+        style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+      >
+        {link}
+        <span
+          className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+          style={{
+            background: index % 2 === 0 ? "#FF2DD1" : "#4DFFBE",
+          }}
+        ></span>
+      </a>
+    );
+  }
+})}
+
           </div>
 
           {/* Mobile menu button */}
@@ -151,31 +151,19 @@ export const Navbar = () => {
                   </Link>
                 );
               } else if (link === "Work") {
-                return (
-                  <Link
-                    key={link}
-                    to="/work"
-                    className="block font-medium text-gray-100 px-2 py-2 rounded hover:bg-white/10 hover:text-white transition-colors"
-                    onClick={() => setIsOpen(false)}
-                    style={{ textShadow: "0 0 6px rgba(255, 255, 255, 0.5)" }}
-                  >
-                    {link}
-                  </Link>
-                );
-              } else if (link === "Resume") {
-                return (
-                  <Link
-                    key={link}
-                    to="/resume"
-                    className="block font-medium text-gray-100 px-2 py-2 rounded hover:bg-white/10 hover:text-white transition-colors"
-                    onClick={() => setIsOpen(false)}
-                    style={{ textShadow: "0 0 6px rgba(255, 255, 255, 0.5)" }}
-                  >
-                    {link}
-                  </Link>
-                );
-              } else {
-                return (
+                  return (
+                    <Link
+                      key={link}
+                      to="/work"
+                      className="block font-medium text-gray-100 px-2 py-2 rounded hover:bg-white/10 hover:text-white transition-colors"
+                      onClick={() => setIsOpen(false)}
+                      style={{ textShadow: "0 0 6px rgba(255, 255, 255, 0.5)" }}
+                    >
+                      {link}
+                    </Link>
+                  );
+                } else {
+                  return (
                   <a
                     key={link}
                     href="#"
