@@ -1,24 +1,15 @@
-import { defineConfig } from 'vite';
-import react from '@vitejs/plugin-react';
-import tailwindcss from '@tailwindcss/vite';
-import { viteStaticCopy } from 'vite-plugin-static-copy';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig({
+  server: {
+    host: true, // or '0.0.0.0' to listen on all network interfaces
+    port: 5173,
+  },
   plugins: [
     react(),
     tailwindcss(),
-    viteStaticCopy({
-      targets: [
-        {
-          src: 'node_modules/pdfjs-dist/build/pdf.worker.min.mjs',
-          dest: '.', // copies to /public/pdf.worker.min.mjs
-        }
-      ]
-    }),
   ],
-  server: {
-    proxy: {
-      '/api': 'http://localhost:8000'
-    }
-  }
-});
+})
+

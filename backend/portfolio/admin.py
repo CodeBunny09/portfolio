@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike, Resume
+from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike, Resume, Testimonial
 
 class ProjectAdminForm(forms.ModelForm):
     class Meta:
@@ -114,3 +114,8 @@ class GalleryLikeAdmin(admin.ModelAdmin):
 @admin.register(Resume)
 class ResumeAdmin(admin.ModelAdmin):
     list_display = ['title', 'file', 'uploaded_at']
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    list_display = ['client_name', 'client_title', 'content', 'rating', 'created_at']
+    search_fields = ['client_name', 'client_title', 'content']

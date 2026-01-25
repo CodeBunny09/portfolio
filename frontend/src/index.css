@@ -1,122 +1,202 @@
 @import "tailwindcss";
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #1A1A1A;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #FF2DD1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #B8207A;
-}
-
-/* Hide default cursor everywhere - enhanced approach */
-*, *::before, *::after, html, body, #root {
-  cursor: none !important;
+/* ---- ROOT RESET ---- */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background-color: #1A1A1B;
+  overscroll-behavior: none;
 }
 
 body {
-  cursor: none !important;
-  background: #0A0A0A;
+  display: block;
+  overflow-x: hidden;
 }
 
-html {
-  cursor: none !important;
+/* ---- GLOBAL BACKGROUND ---- */
+#root {
+  position: relative;
+  isolation: isolate;
 }
 
-/* Force hide cursor on all interactive elements */
-a, button, input, textarea, select, [role="button"], [onclick], [onmousedown], [onmouseup] {
-  cursor: none !important;
-}
-
-/* Additional fallback */
-.cursor-none {
-  cursor: none !important;
-}
-
-/* Create custom cursor */
-.custom-cursor {
+/* ---- ANIMATED NOISE (GIF) ---- */
+#root::before {
+  content: "";
   position: fixed;
-  top: 0;
+  inset: -200%;
+  pointer-events: none;
+
+  background-image: url("/src/assets/static-glitch.gif");
+  background-repeat: repeat;
+  background-size: 150px 150px;
+
+  opacity: 0.12;
+  mix-blend-mode: color-dodge;
+
+  animation: noiseMove 1.5s steps(2) infinite;
+  z-index: 0;
+}
+
+/* ---- NOISE MOTION ---- */
+@keyframes noiseMove {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(120px, 120px, 0);
+  }
+}
+
+
+/* navbar styles */
+/* ===== NAVBAR STYLES ===== */
+
+/* Desktop Navbar Container */
+.navbar-container-desktop {
+  display: inline-flex;
+  align-items: center;
+  height: 58px;
+  padding: 11px 10px;
+  gap: 40px;
+  white-space: nowrap;  
+  background-color: rgba(15, 15, 15, 0.25); /* More transparent */
+  backdrop-filter: blur(24px) saturate(120%);
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  border: none; /* Completely borderless */
+  border-radius: 28px;
+}
+
+
+/* Mobile Navbar Container - FULL WIDTH */
+.navbar-container-mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 58px;
+  padding: 11px 12px;
+  width: auto;
+  white-space: nowrap;  
+  background-color: rgba(15, 15, 15, 0.25); /* More transparent */
+  backdrop-filter: blur(24px) saturate(120%);
+  -webkit-backdrop-filter: blur(24px) saturate(120%);
+  border: none;
+  border-radius: 28px;
+  box-shadow: none;
+}
+
+/* Avatar */
+.avatar-link {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #D0FF71 0%, #A0D050 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: black;
+  font-size: 16px;
+  /* Removed box-shadow for no white outline */
+}
+
+.avatar-availability-indicator {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background-color: #00FF00;
+  border-radius: 50%;
+  border: 2px solid #0F0F0F;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+
+/* 3D Flip Text */
+.nav-flip-text {
+  position: relative;
+  display: block;
+  height: 24px;
+  overflow: visible;
+  cursor: pointer;
+  perspective: 500px;
+}
+
+/* Availability Indicator */
+.availability-dot-container {
+  position: relative;
+  width: 4px;
+  height: 4px;
+  flex-shrink: 0;
+}
+
+.availability-dot-glow {
+  position: absolute;
+  inset: 0;
+  width: 4px;
+  height: 4px;
+  background-color: #00FF00;
+  border-radius: 50%;
+  filter: blur(0.5px);
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.availability-dot {
+  position: relative;
+  width: 4px;
+  height: 4px;
+  background-color: #00FF00;
+  border-radius: 50%;
+}
+
+
+
+/* Mobile Menu Button */
+.mobile-menu-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #D0FF71;
+  color: black;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.mobile-menu-button:hover {
+  background-color: #B8E85F;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  position: absolute;
+  top: calc(100% + 16px);
   left: 0;
-  width: 14px;
-  height: 14px;
-  background: linear-gradient(45deg, rgba(255, 45, 209, 0.4), rgba(99, 200, 255, 0.4));
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  will-change: transform;
-  transition: width 0.2s ease, height 0.2s ease;
-  box-shadow: 0 0 10px rgba(255, 45, 209, 0.2);
+  right: 0;
+  padding: 40px 50px;
+background-color: rgba(15, 15, 15, 0.25);
+backdrop-filter: blur(32px) saturate(140%);
+  -webkit-backdrop-filter: blur(28px) saturate(150%);
+  border: none;
+  border-radius: 24px;
+  box-shadow: none;
 }
 
-/* Hover effect - larger with glow */
-.custom-cursor.hover {
-  width: 20px;
-  height: 20px;
-  background: linear-gradient(45deg, rgba(77, 255, 190, 0.5), rgba(253, 255, 184, 0.5));
-  box-shadow: 0 0 20px rgba(77, 255, 190, 0.3);
-}
-
-/* Click effect - smaller and brighter */
-.custom-cursor.click {
-  width: 10px;
-  height: 10px;
-  background: rgba(253, 255, 184, 0.6);
-  box-shadow: 0 0 15px rgba(253, 255, 184, 0.4);
-}
-
-@import "tailwindcss";
-
-/* === GLOBAL LAYOUT FIXES === */
-html, body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;          /* No horizontal scroll */
-  background: #0A0A0A;
-  cursor: none !important;
-  /* Prevent width jump when vertical scrollbar appears */
-  scrollbar-gutter: stable both-edges;
-}
-
-/* Hide scrollbars everywhere */
-* { scrollbar-width: none; }
-*::-webkit-scrollbar { width: 0; height: 0; display: none; }
-
-/* Keep your custom cursor everywhere */
-*, *::before, *::after, html, body, #root { cursor: none !important; }
-a, button, input, textarea, select, [role="button"], [onclick], [onmousedown], [onmouseup] { cursor: none !important; }
-
-/* Custom cursor styles (unchanged) */
-.custom-cursor {
-  position: fixed;
-  top: 0; left: 0;
-  width: 14px; height: 14px;
-  background: linear-gradient(45deg, rgba(255, 45, 209, 0.4), rgba(99, 200, 255, 0.4));
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  will-change: transform;
-  transition: width 0.2s ease, height 0.2s ease;
-  box-shadow: 0 0 10px rgba(255, 45, 209, 0.2);
-}
-.custom-cursor.hover {
-  width: 20px; height: 20px;
-  background: linear-gradient(45deg, rgba(77, 255, 190, 0.5), rgba(253, 255, 184, 0.5));
-  box-shadow: 0 0 20px rgba(77, 255, 190, 0.3);
-}
-.custom-cursor.click {
-  width: 10px; height: 10px;
-  background: rgba(253, 255, 184, 0.6);
-  box-shadow: 0 0 15px rgba(253, 255, 184, 0.4);
+/* Typography Enhancement */
+.nav-flip-text,
+.availability-dot-container + span,
+.mobile-menu-overlay a {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }

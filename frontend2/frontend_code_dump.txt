@@ -1,0 +1,84 @@
+===============================
+FILE: frontend/src/App.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/main.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/index.css
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/tailwind.config.js
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/vite.config.js
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/pages/Home.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/components/layout/Navbar.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/components/layout/ParticlesBackground.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/components/sections/WorkCarousel.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/components/ui/ProjectCard.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/hooks/useAPI.js
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/package.json
+===============================
+
+❌ FILE NOT FOUND
+
+

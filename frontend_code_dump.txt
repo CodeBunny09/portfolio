@@ -1,3 +1,339 @@
+===============================
+FILE: frontend/src/App.jsx
+===============================
+
+import { motion, useScroll, useTransform } from "framer-motion"
+import { useRef } from "react"
+import Navbar from "./components/Navbar"
+
+const cards = [
+  { id: 1, color: "bg-red-500", label: "Card One" },
+  { id: 2, color: "bg-blue-500", label: "Card Two" },
+  { id: 3, color: "bg-green-500", label: "Card Three" },
+  { id: 4, color: "bg-purple-500", label: "Card Four" },
+]
+
+export default function App() {
+  const containerRef = useRef(null)
+
+  // 🔴 IMPORTANT: DO NOT use target-based scroll here
+  const { scrollYProgress } = useScroll()
+
+  return (
+    <div className="relative z-10 text-white w-screen">
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Scroll space */}
+      <div ref={containerRef} className="relative h-[400vh]">
+        <div className="sticky top-0 h-screen flex items-center justify-center">
+          <div className="relative w-80 h-96">
+            {cards.map((card, index) => {
+              const start = index / cards.length
+              const end = (index + 1) / cards.length
+
+              const y = useTransform(scrollYProgress, [start, end], [120, 0])
+              const opacity = useTransform(scrollYProgress, [start, end], [0, 1])
+              const scale = useTransform(scrollYProgress, [start, end], [0.96, 1])
+
+              return (
+                <motion.div
+                  key={card.id}
+                  style={{
+                    y,
+                    opacity,
+                    scale,
+                    top: index * 15,
+                    zIndex: index + 1,
+                  }}
+                  className={`absolute inset-0 rounded-2xl shadow-2xl ${card.color}
+                    flex items-center justify-center text-2xl font-bold`}
+                >
+                  {card.label}
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+===============================
+FILE: frontend/src/main.jsx
+===============================
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+
+
+===============================
+FILE: frontend/src/index.css
+===============================
+
+@import "tailwindcss";
+
+/* ---- ROOT RESET ---- */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background-color: #1A1A1B;
+  overscroll-behavior: none;
+}
+
+body {
+  display: block;
+  overflow-x: hidden;
+}
+
+/* ---- GLOBAL BACKGROUND ---- */
+#root {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ---- ANIMATED NOISE (GIF) ---- */
+#root::before {
+  content: "";
+  position: fixed;
+  inset: -200%;
+  pointer-events: none;
+
+  background-image: url("/src/assets/static-glitch.gif");
+  background-repeat: repeat;
+  background-size: 150px 150px;
+
+  opacity: 0.12;
+  mix-blend-mode: color-dodge;
+
+  animation: noiseMove 1.5s steps(2) infinite;
+  z-index: 0;
+}
+
+/* ---- NOISE MOTION ---- */
+@keyframes noiseMove {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(120px, 120px, 0);
+  }
+}
+
+
+/* navbar styles */
+/* ===== NAVBAR STYLES ===== */
+
+/* Navbar Container */
+.navbar-container {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 8px 10px;
+  gap: 40px;
+  background-color: rgba(15, 15, 15, 0.90);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #0F0F0F;
+  border-radius: 28px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Avatar */
+.avatar-link {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #D0FF71 0%, #A0D050 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: black;
+  font-size: 16px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.avatar-availability-indicator {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background-color: #00FF00;
+  border-radius: 50%;
+  border: 2px solid #0F0F0F;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 3D Flip Text */
+.nav-flip-text {
+  position: relative;
+  display: block;
+  height: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  perspective: 500px;
+}
+
+/* Availability Indicator */
+.availability-dot-container {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.availability-dot-glow {
+  position: absolute;
+  inset: 0;
+  width: 8px;
+  height: 8px;
+  background-color: #00FF00;
+  border-radius: 50%;
+  filter: blur(4px);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.availability-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  background-color: #00FF00;
+  border-radius: 50%;
+}
+
+/* Contact Button */
+.contact-button {
+  padding: 8px 20px;
+  background-color: white;
+  color: black;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.contact-button:hover {
+  background-color: #D0FF71;
+}
+
+/* Mobile Menu Button */
+.mobile-menu-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #D0FF71;
+  color: black;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.mobile-menu-button:hover {
+  background-color: #B8E85F;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  position: absolute;
+  top: calc(100% + 16px);
+  left: 0;
+  right: 0;
+  padding: 32px;
+  background-color: rgba(15, 15, 15, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+              inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+===============================
+FILE: frontend/tailwind.config.js
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/vite.config.js
+===============================
+
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import tailwindcss from '@tailwindcss/vite'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    tailwindcss(),
+  ],
+})
+
+
+
+===============================
+FILE: frontend/src/pages/Home.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/components/layout/Navbar.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/components/layout/ParticlesBackground.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/components/sections/WorkCarousel.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/components/ui/ProjectCard.jsx
+===============================
+
+❌ FILE NOT FOUND
+
+
+===============================
+FILE: frontend/src/hooks/useAPI.js
+===============================
+
 // src/hooks/useAPI.js
 import { useEffect, useState } from "react";
 
@@ -494,3 +830,42 @@ export async function addGalleryComment(id, text) {
     body: JSON.stringify({ text }),
   });
 }
+
+
+===============================
+FILE: frontend/package.json
+===============================
+
+{
+  "name": "frontend",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.1.18",
+    "framer-motion": "^12.29.0",
+    "lucide-react": "^0.563.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "eslint": "^9.39.1",
+    "eslint-plugin-react-hooks": "^7.0.1",
+    "eslint-plugin-react-refresh": "^0.4.24",
+    "globals": "^16.5.0",
+    "vite": "^7.2.4"
+  }
+}
+
+

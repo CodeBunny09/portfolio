@@ -1,0 +1,1501 @@
+===== BACKEND FILES =====
+
+===== FILE: backend/portfolio/models.py =====
+
+# backend/portfolio/models.py
+from django.db import models
+from django.core.validators import URLValidator
+import uuid
+from django.conf import settings
+
+# models.py
+
+class Profile(models.Model):
+    name = models.CharField(max_length=100, default="Pratik")
+    tagline = models.TextField(default="dev, analyst, designer, creator")
+    bio = models.TextField(max_length=500)
+    profile_image = models.ImageField(upload_to='profile/', blank=True, null=True)
+
+    # ⬇️ allow relative or absolute strings (no URL validation)
+    profile_image_url = models.CharField(max_length=500, blank=True, null=True)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        verbose_name_plural = "Profile"
+
+    def __str__(self):
+        return self.name
+
+
+
+class SocialLink(models.Model):
+    PLATFORM_CHOICES = [
+        ('github', 'GitHub'),
+        ('linkedin', 'LinkedIn'),
+        ('twitter', 'Twitter'),
+        ('blog', 'Blog'),
+        ('email', 'Email'),
+        ('instagram', 'Instagram'),
+        ('youtube', 'YouTube'),
+        ('other', 'Other'),
+    ]
+    
+    profile = models.ForeignKey(Profile, related_name='social_links', on_delete=models.CASCADE)
+    platform = models.CharField(max_length=20, choices=PLATFORM_CHOICES)
+    url = models.URLField()
+    display_name = models.CharField(max_length=100, blank=True)
+    is_visible = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'platform']
+        unique_together = ['profile', 'platform']
+
+    def __str__(self):
+        return f"{self.profile.name} - {self.get_platform_display()}"
+
+class TechStack(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+    color = models.CharField(max_length=7, default="#FF2DD1")  # Hex color
+    category = models.CharField(max_length=50, blank=True)  # frontend, backend, database, etc.
+
+    class Meta:
+        ordering = ['category', 'name']
+
+    def __str__(self):
+        return self.name
+
+
+class Project(models.Model):
+    PROJECT_TYPES = [
+        ('github', 'GitHub'),
+        ('linkedin', 'LinkedIn'),
+        ('personal', 'Personal'),
+        ('client', 'Client'),
+    ]
+
+    STATUS_CHOICES = [
+        ('active', 'Active'),
+        ('completed', 'Completed'),
+        ('archived', 'Archived'),
+        ('draft', 'Draft'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    long_description = models.TextField(blank=True)
+    project_type = models.CharField(max_length=20, choices=PROJECT_TYPES, default='personal')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='active')
+
+    # URLs
+    project_url = models.URLField(blank=True, null=True)
+    github_url = models.URLField(blank=True, null=True)
+    demo_url = models.URLField(blank=True, null=True)
+    linkedin_post_url = models.URLField(blank=True, null=True)
+
+    # Media
+    featured_image = models.ImageField(upload_to='projects/', blank=True, null=True)
+    # removed featured_image_url completely
+
+    # Tech stack
+    tech_stack = models.ManyToManyField('TechStack', blank=True)
+
+    # Stats
+    github_stars = models.PositiveIntegerField(default=0)
+    github_forks = models.PositiveIntegerField(default=0)
+    linkedin_likes = models.PositiveIntegerField(default=0)
+    linkedin_comments = models.PositiveIntegerField(default=0)
+
+    # Display
+    is_featured = models.BooleanField(default=False)
+    is_visible = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    project_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-is_featured', 'order', '-created_at']
+
+    def __str__(self):
+        return self.title
+
+    @property
+    def primary_link(self):
+        if self.project_type == 'github' and self.github_url:
+            return self.github_url
+        elif self.project_type == 'linkedin' and self.linkedin_post_url:
+            return self.linkedin_post_url
+        elif self.demo_url:
+            return self.demo_url
+        elif self.project_url:
+            return self.project_url
+        return self.github_url
+
+    @property
+    def featured_image_url(self):
+        """
+        Returns the absolute URL of the uploaded image (for API/Frontend).
+        """
+        if self.featured_image:
+            try:
+                request = getattr(self, '_request', None)
+                if request:
+                    return request.build_absolute_uri(self.featured_image.url)
+            except Exception:
+                pass
+            return f"{settings.MEDIA_URL}{self.featured_image}"
+        return None
+
+    @property
+    def stats(self):
+        if self.project_type == 'github':
+            return {'stars': self.github_stars, 'forks': self.github_forks}
+        elif self.project_type == 'linkedin':
+            return {'likes': self.linkedin_likes, 'comments': self.linkedin_comments}
+        return {}
+
+
+class BlogPost(models.Model):
+    """For future blog functionality"""
+    title = models.CharField(max_length=200)
+    slug = models.SlugField(unique=True)
+    excerpt = models.TextField(max_length=300)
+    content = models.TextField()
+    featured_image = models.ImageField(upload_to='blog/', blank=True, null=True)
+    is_published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    published_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        ordering = ['-published_at', '-created_at']
+
+    def __str__(self):
+        return self.title
+    
+
+class ContactPlatform(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    url = models.URLField()
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ['order', 'title']
+
+    def __str__(self):
+        return self.title
+
+
+class GalleryImage(models.Model):
+    title = models.CharField(max_length=180)
+    description = models.TextField(blank=True)
+    image = models.ImageField(upload_to="gallery/images/")
+    tags = models.CharField(max_length=250, blank=True, help_text="Comma separated")
+    date = models.DateField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def tag_list(self):
+        return [tag.strip() for tag in self.tags.split(",") if tag.strip()] if self.tags else []
+
+    def __str__(self):
+        return self.title
+
+class GalleryComment(models.Model):
+    image = models.ForeignKey(GalleryImage, related_name="comments", on_delete=models.CASCADE)
+    text = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    # For anonymous, no user field
+
+class GalleryLike(models.Model):
+    image = models.ForeignKey(GalleryImage, related_name="likes", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    # For anonymous, no user field
+
+
+class Resume(models.Model):
+    title = models.CharField(max_length=120, default="Resume")
+    file = models.FileField(upload_to="resume/")
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+===== END OF backend/portfolio/models.py =====
+
+
+===== FILE: backend/portfolio/views.py =====
+
+# backend/portfolio/views.py
+from rest_framework import generics, status, viewsets, permissions
+from rest_framework.decorators import api_view, action
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from .models import Profile, Project, BlogPost, ContactPlatform, Resume
+from rest_framework import viewsets
+from .serializers import ProfileSerializer, ProjectSerializer, BlogPostSerializer, ContactPlatformSerializer, ResumeSerializer
+from rest_framework.generics import RetrieveAPIView
+
+
+
+
+class ProfileView(generics.RetrieveAPIView):
+    serializer_class = ProfileSerializer
+    
+    def get_object(self):
+        return get_object_or_404(Profile, is_active=True)
+
+class ProjectListView(generics.ListAPIView):
+    serializer_class = ProjectSerializer
+    
+    def get_queryset(self):
+        queryset = Project.objects.filter(is_visible=True)
+        
+        # Filter by featured projects
+        featured_only = self.request.query_params.get('featured', None)
+        if featured_only and featured_only.lower() == 'true':
+            queryset = queryset.filter(is_featured=True)
+        
+        # Filter by project type
+        project_type = self.request.query_params.get('type', None)
+        if project_type:
+            queryset = queryset.filter(project_type=project_type)
+        
+        # Limit results
+        limit = self.request.query_params.get('limit', None)
+        if limit:
+            try:
+                queryset = queryset[:int(limit)]
+            except ValueError:
+                pass
+                
+        return queryset
+
+class ProjectDetailView(generics.RetrieveAPIView):
+    queryset = Project.objects.filter(is_visible=True)
+    serializer_class = ProjectSerializer
+
+class BlogPostListView(generics.ListAPIView):
+    queryset = BlogPost.objects.filter(is_published=True)
+    serializer_class = BlogPostSerializer
+
+@api_view(['GET'])
+def api_health(request):
+    """Simple health check endpoint"""
+    return Response({
+        'status': 'healthy',
+        'message': 'Portfolio API is running'
+    }, status=status.HTTP_200_OK)
+
+
+
+# Contacts Page
+class ContactPlatformViewSet(viewsets.ModelViewSet):
+    queryset = ContactPlatform.objects.all()
+    serializer_class = ContactPlatformSerializer
+
+
+
+from .models import GalleryImage, GalleryComment, GalleryLike
+from .serializers import GalleryImageSerializer, GalleryCommentSerializer
+
+class GalleryImageViewSet(viewsets.ModelViewSet):
+    queryset = GalleryImage.objects.all().order_by('-date')
+    serializer_class = GalleryImageSerializer
+    permission_classes = [permissions.AllowAny]
+
+    @action(detail=True, methods=['post'])
+    def add_comment(self, request, pk=None):
+        img = self.get_object()
+        text = request.data.get('text')
+        if text:
+            comment = GalleryComment(image=img, text=text)
+            comment.save()
+            return Response(GalleryCommentSerializer(comment).data, status=201)
+        return Response({'error': 'Text required.'}, status=400)
+
+    @action(detail=True, methods=['post'])
+    def add_like(self, request, pk=None):
+        img = self.get_object()
+        like = GalleryLike(image=img)
+        like.save()
+        return Response({'message': 'Like added', 'like_count': img.likes.count()}, status=201)
+
+    @action(detail=True, methods=['get'])
+    def get_meta(self, request, pk=None):
+        img = self.get_object()
+        return Response({
+            'likes': img.likes.count(),
+            'comments': GalleryCommentSerializer(img.comments.all(), many=True).data
+        })
+    
+
+class ResumeListView(generics.ListAPIView):
+    queryset = Resume.objects.order_by('-uploaded_at')
+    serializer_class = ResumeSerializer
+    permission_classes = [permissions.AllowAny]
+
+===== END OF backend/portfolio/views.py =====
+
+
+===== FILE: backend/portfolio/serializers.py =====
+
+from rest_framework import serializers
+from rest_framework import serializers
+from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike, Resume
+from django.conf import settings
+
+
+
+# serializers.py
+class SocialLinkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SocialLink
+        fields = ['platform', 'url', 'display_name', 'is_visible']
+
+class ProfileSerializer(serializers.ModelSerializer):
+    social_links = SocialLinkSerializer(many=True, read_only=True)
+    profile_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profile
+        fields = ['name', 'tagline', 'bio', 'profile_image_url', 'social_links']
+
+    def get_profile_image_url(self, obj):
+        # 1) If a file is uploaded, return its absolute URL
+        if obj.profile_image:
+            request = self.context.get('request')
+            url = obj.profile_image.url
+            return request.build_absolute_uri(url) if request else url
+
+        # 2) If a string is stored, allow both absolute and relative
+        val = (obj.profile_image_url or "").strip()
+        if not val:
+            return None
+
+        # Absolute URL -> return as-is
+        if val.startswith("http://") or val.startswith("https://"):
+            return val
+
+        # Relative path -> optionally prefix with a base (if you set it), else return as-is
+        base = getattr(settings, "FRONTEND_ASSET_BASE", "").rstrip("/")
+        if base:
+            # Normalize leading './' to '/' and join
+            cleaned = val[1:] if val.startswith("./") else val
+            if not cleaned.startswith("/"):
+                cleaned = "/" + cleaned
+            return f"{base}{cleaned}"
+        return val
+
+class TechStackSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TechStack
+        fields = ['name', 'color', 'category']
+
+# serializers.py
+class ProjectSerializer(serializers.ModelSerializer):
+    tech_stack = TechStackSerializer(many=True, read_only=True)
+    tech_stack_names = serializers.SerializerMethodField()
+    link = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    type = serializers.CharField(source='project_type')
+
+    class Meta:
+        model = Project
+        fields = [
+            'id', 'title', 'description', 'type', 'link', 'image',
+            'tech_stack', 'tech_stack_names', 'is_featured',
+            'github_stars', 'github_forks', 'linkedin_likes', 'linkedin_comments',
+            'created_at', 'project_date'
+        ]
+
+    def get_tech_stack_names(self, obj):
+        return [tech.name for tech in obj.tech_stack.all()]
+
+    def get_link(self, obj):
+        return obj.primary_link
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.featured_image:
+            return request.build_absolute_uri(obj.featured_image.url) if request else obj.featured_image.url
+        if obj.featured_image_url:
+            return obj.featured_image_url
+        return None
+
+
+class BlogPostSerializer(serializers.ModelSerializer):
+    featured_image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = BlogPost
+        fields = [
+            'id', 'title', 'slug', 'excerpt', 'featured_image_url',
+            'published_at', 'created_at'
+        ]
+
+    def get_featured_image_url(self, obj):
+        if obj.featured_image:
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(obj.featured_image.url)
+        return None
+
+
+# serializers.py (in your django app)
+
+class ContactPlatformSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactPlatform
+        fields = ['id', 'title', 'description', 'url', 'order']  # Include 'order' if you want it exposed
+
+
+
+
+
+class GalleryCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GalleryComment
+        fields = ['id', 'text', 'created_at']
+
+class GalleryImageSerializer(serializers.ModelSerializer):
+    likes = serializers.SerializerMethodField()
+    comments = GalleryCommentSerializer(many=True, read_only=True)
+    image_url = serializers.ImageField(source='image', read_only=True)
+    tags = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GalleryImage
+        fields = ['id', 'title', 'description', 'image_url', 'tags', 'date', 'created_at', 'likes', 'comments']
+
+    def get_likes(self, obj):
+        return obj.likes.count()
+
+    def get_tags(self, obj):
+        return obj.tag_list()
+
+
+
+class ResumeSerializer(serializers.ModelSerializer):
+    file_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Resume
+        fields = ['id', 'title', 'file_url', 'uploaded_at']
+
+    def get_file_url(self, obj):
+        request = self.context.get('request')
+        return request.build_absolute_uri(obj.file.url) if request else obj.file.url
+
+===== END OF backend/portfolio/serializers.py =====
+
+
+===== FILE NOT FOUND: backend/portfolio/firebase.py =====
+
+===== FILE: backend/backend/settings.py =====
+
+"""
+Django settings for backend project.
+
+Generated by 'django-admin startproject' using Django 5.0.3.
+
+For more information on this file, see
+https://docs.djangoproject.com/en/5.0/topics/settings/
+
+For the full list of settings and their values, see
+https://docs.djangoproject.com/en/5.0/ref/settings/
+"""
+import os
+from pathlib import Path
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
+
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'django-insecure-f!*ykm&+l7dl_vlop5q!^m@u@rg#4xfi9p3xigzsy(87m0&+*3'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0']
+
+
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    # third party
+    'rest_framework',
+    'corsheaders',
+
+    # local 
+    'portfolio'
+]
+
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'backend.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+WSGI_APPLICATION = 'backend.wsgi.application'
+
+
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+
+# Password validation
+# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/5.0/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+
+# Default primary key field type
+# https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)  # create folder if missing (dev-only)
+
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# REST Framework configuration
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+}
+
+# CORS settings for local development
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:5173",  # Vite dev server
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+# For development, you might want to allow all origins
+CORS_ALLOW_ALL_ORIGINS = True  # Only use this in development
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler', 'level': 'DEBUG'},
+    },
+    'loggers': {
+        'django': {'handlers': ['console'], 'level': 'DEBUG'},
+        'django.request': {'handlers': ['console'], 'level': 'DEBUG', 'propagate': False},
+        'portfolio': {'handlers': ['console'], 'level': 'DEBUG'},
+    },
+}
+===== END OF backend/backend/settings.py =====
+
+
+===== FILE NOT FOUND: backend/portfolio/forms.py =====
+
+===== FILE: backend/portfolio/admin.py =====
+
+from django.contrib import admin
+from django import forms
+from .models import Profile, SocialLink, Project, TechStack, BlogPost, ContactPlatform, GalleryImage, GalleryComment, GalleryLike, Resume
+
+class ProjectAdminForm(forms.ModelForm):
+    class Meta:
+        model = Project
+        fields = '__all__'
+
+    def clean(self):
+        cleaned_data = super().clean()
+        image = cleaned_data.get('featured_image')
+
+        print("[DEBUG] Cleaning Project form:")
+        print(f" - Featured Image: {image}")
+
+        # No need to check image_url anymore (it was removed from the model)
+        return cleaned_data
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    form = ProjectAdminForm
+    list_display = ['title', 'project_type', 'is_featured', 'is_visible', 'created_at']
+    list_filter = ['project_type', 'is_featured', 'is_visible', 'status']
+    search_fields = ['title', 'description']
+    filter_horizontal = ['tech_stack']
+    ordering = ['-is_featured', 'order', '-created_at']
+    fieldsets = (
+        ('Basic Info', {
+            'fields': ('title', 'description', 'long_description', 'project_type', 'status')
+        }),
+        ('URLs', {
+            'fields': ('project_url', 'github_url', 'demo_url', 'linkedin_post_url')
+        }),
+        ('Media', {
+            'fields': ('featured_image',)  # removed featured_image_url
+        }),
+        ('Tech & Stats', {
+            'fields': ('tech_stack', 'github_stars', 'github_forks', 'linkedin_likes', 'linkedin_comments')
+        }),
+        ('Display Options', {
+            'fields': ('is_featured', 'is_visible', 'order', 'project_date')
+        }),
+    )
+
+# Other admin registrations
+# admin.py
+@admin.register(Profile)
+class ProfileAdmin(admin.ModelAdmin):
+    list_display = ['name', 'is_active', 'created_at']
+    list_filter = ['is_active', 'created_at']
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'tagline', 'bio')
+        }),
+        ('Image', {
+            'fields': ('profile_image', 'profile_image_url'),
+            'description': "Upload a Profile image OR provide a URL. URLs can be absolute (https://...) or relative (e.g. ./src/assets/mypic.png).",
+        }),
+        ('Status', {'fields': ('is_active',)}),
+    )
+class SocialLinkInline(admin.TabularInline):
+    model = SocialLink
+    extra = 1
+    ordering = ['order']
+
+@admin.register(SocialLink)
+class SocialLinkAdmin(admin.ModelAdmin):
+    list_display = ['profile', 'platform', 'url', 'is_visible', 'order']
+    list_filter = ['platform', 'is_visible']
+    ordering = ['profile', 'order']
+
+@admin.register(TechStack)
+class TechStackAdmin(admin.ModelAdmin):
+    list_display = ['name', 'category', 'color']
+    list_filter = ['category']
+    search_fields = ['name']
+
+@admin.register(BlogPost)
+class BlogPostAdmin(admin.ModelAdmin):
+    list_display = ['title', 'is_published', 'published_at', 'created_at']
+    list_filter = ['is_published', 'created_at']
+    search_fields = ['title', 'content']
+    prepopulated_fields = {'slug': ('title',)}
+
+
+@admin.register(ContactPlatform)
+class ContactPlatformAdmin(admin.ModelAdmin):
+    list_display = ['title', 'url', 'order']
+    search_fields = ['title', 'description', 'url']
+    ordering = ['order', 'title']
+
+
+
+
+@admin.register(GalleryImage)
+class GalleryImageAdmin(admin.ModelAdmin):
+    list_display = ['title', 'date', 'image']
+    search_fields = ['title', 'description', 'tags']
+    ordering = ['-date']
+
+@admin.register(GalleryComment)
+class GalleryCommentAdmin(admin.ModelAdmin):
+    list_display = ['image', 'text', 'created_at']
+    search_fields = ['text']
+
+@admin.register(GalleryLike)
+class GalleryLikeAdmin(admin.ModelAdmin):
+    list_display = ['image', 'created_at']
+
+
+
+@admin.register(Resume)
+class ResumeAdmin(admin.ModelAdmin):
+    list_display = ['title', 'file', 'uploaded_at']
+
+===== END OF backend/portfolio/admin.py =====
+
+
+===== FILE: frontend/src/hooks/useAPI.js =====
+
+// src/hooks/useAPI.js
+import { useEffect, useState } from 'react';
+
+const API_BASE_URL = 'http://127.0.0.1:8000/api'; // change for production
+
+
+
+export function useFeaturedProjects(limit = 4) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/projects/?featured=true&limit=${limit}`);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        const json = await response.json();
+        // Always ensure array
+        if (Array.isArray(json)) setData(json);
+        else if ('results' in json && Array.isArray(json.results)) setData(json.results);
+        else setData([]);
+      } catch (err) {
+        setError(err.message);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProjects();
+  }, [limit]);
+
+  return { data, loading, error };
+}
+
+
+
+export function useProfile() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const response = await fetch(`${API_BASE_URL}/profile/`);
+        if (!response.ok) throw new Error(`Error: ${response.status}`);
+        const json = await response.json();
+        setData(json);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  return { data, loading, error };
+}
+
+export function useGalleryImages() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/gallery/`)
+      .then(res => res.json())
+      .then(json => {
+        // support paginated and non-paginated:
+        if (Array.isArray(json)) setData(json);
+        else if ('results' in json && Array.isArray(json.results)) setData(json.results);
+        else setData([]); // fallback
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+}
+
+
+export async function addGalleryLike(id) {
+  return fetch(`${API_BASE_URL}/gallery/${id}/add_like/`, { method: 'POST' });
+}
+
+export async function addGalleryComment(id, text) {
+  return fetch(`${API_BASE_URL}/gallery/${id}/add_comment/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text })
+  });
+}
+
+
+export function useContactPlatforms() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/contact-platforms/`)
+      .then(res => res.json())
+      .then(json => {
+        // support paginated and non-paginated:
+        if (Array.isArray(json)) setData(json);
+        else if ('results' in json && Array.isArray(json.results)) setData(json.results);
+        else setData([]);
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+  return { data, loading, error };
+}
+
+
+export function useAllProjects({ page = 1, page_size = 18 } = {}) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/projects?page=${page}&page_size=${page_size}`)
+      .then(res => res.json())
+      .then(json => {
+        if (Array.isArray(json)) setData(json);
+        else if ('results' in json && Array.isArray(json.results)) setData(json.results);
+        else setData([]);
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [page, page_size]);
+  return { data, loading, error };
+}
+
+
+export function useResume() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("http://127.0.0.1:8000/api/resume/")
+      .then(res => res.json())
+      .then(json => {
+        // Handles paginated (results) or plain array
+        if ("results" in json) setData(json.results);
+        else setData(json); // fallback if needed
+      })
+      .catch(e => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+}
+
+===== END OF frontend/src/hooks/useAPI.js =====
+
+
+===== FILE: frontend/src/pages/Home.jsx =====
+
+// src/pages/Home.jsx
+import React, { useEffect, useState, useMemo } from 'react';
+import { FaGithub, FaLinkedin, FaTwitter, FaBlog, FaInstagram } from 'react-icons/fa';
+import ParticlesBackground from '../components/layout/ParticlesBackground';
+import Navbar from '../components/layout/Navbar';
+import CustomCursor from '../components/ui/CustomCursor';
+import WorkCarousel from '../components/sections/WorkCarousel';
+import { useProfile } from '../hooks/useAPI';
+import { useNavigate } from "react-router-dom";
+
+import '../App.css';
+
+function Home() {
+  const [showRest, setShowRest] = useState(false);
+  const { data: profile, loading, error } = useProfile();
+
+  // ---- Typewriter state ----
+  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [displayedText, setDisplayedText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // ensure taglineParts is stable; trim spaces
+  const taglineParts = useMemo(
+    () => (profile?.tagline ? profile.tagline.split(',').map(p => p.trim()).filter(Boolean) : []),
+    [profile?.tagline]
+  );
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowRest(true), 480);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const ParticlesMemo = useMemo(() => <ParticlesBackground />, []);
+  useEffect(() => {
+    if (taglineParts.length === 0) return;
+
+    const currentWord = taglineParts[currentWordIndex];
+    const typingSpeed = isDeleting ? 60 : 110;
+    const pauseAfterTyped = 900;
+
+    let timeoutId;
+
+    const tick = () => {
+      if (!isDeleting && displayedText.length < currentWord.length) {
+        setDisplayedText(currentWord.slice(0, displayedText.length + 1));
+      } else if (!isDeleting && displayedText.length === currentWord.length) {
+        timeoutId = setTimeout(() => setIsDeleting(true), pauseAfterTyped);
+      } else if (isDeleting && displayedText.length > 0) {
+        setDisplayedText(currentWord.slice(0, displayedText.length - 1));
+      } else if (isDeleting && displayedText.length === 0) {
+        setIsDeleting(false);
+        setCurrentWordIndex((prev) => (prev + 1) % taglineParts.length);
+      }
+    };
+
+    if (!timeoutId) timeoutId = setTimeout(tick, typingSpeed);
+
+    return () => clearTimeout(timeoutId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [displayedText, isDeleting, currentWordIndex, taglineParts.length]);
+
+  const socials = {};
+  if (profile?.social_links) {
+    profile.social_links.forEach(link => {
+      socials[link.platform] = link.url;
+    });
+  }
+
+  const navigate = useNavigate();
+
+
+  return (
+    <div className="w-screen min-h-screen cursor-none relative overflow-y-auto overflow-x-hidden hide-scrollbar bg-transparent">
+      <CustomCursor />
+      {ParticlesMemo}
+      <Navbar />
+      {/* Hero Section */}
+      <section className="relative z-10 flex flex-col lg:flex-row items-center justify-center px-4 py-8 max-w-6xl mx-auto overflow-visible">
+        {/* Left Column */}
+        <div className="flex-1 text-left flex flex-col items-start">
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight space-y-2" style={{ overflow: 'visible' }}>
+            <div className="fade-line" style={{ animationDelay: '0.2s' }}>
+              Hi, I'm {profile?.name || 'Pratik'}
+            </div>
+            {/* Typewriter tagline — larger than the hi text */}
+            {taglineParts.length > 0 && (
+              <div
+                className="fade-line tagline text-[2.6rem] lg:text-[3.2rem] font-extrabold"
+                style={{ animationDelay: '0.8s', display: 'block', overflow: 'visible', lineHeight: 1.05, paddingBottom: '6px' }}
+              >
+                {displayedText}
+                <span style={{ display: 'inline-block', width: 1, background: '#fff', marginLeft: 6, height: '1.05em', verticalAlign: 'bottom', animation: 'blink 1s step-start infinite' }} />
+              </div>
+            )}
+          </h1>
+          {showRest && (
+            <>
+              <p
+                className="text-sm lg:text-base text-gray-300 leading-relaxed max-w-md mt-4 mb-4 fade-in"
+                style={{ animationDelay: '2s' }}
+              >
+                {profile?.bio || "I'm a developer and analyst who loves turning tricky problems into clever solutions—whether it's models, dashboards, or full-on experiments. I thrive on learning, building, and the occasional debugging adventure."}
+              </p>
+              {/* Social Icons */}
+              <div className="flex space-x-5 mt-2 fade-in" style={{ animationDelay: '2.2s' }}>
+                {socials.github && (
+                  <a href={socials.github} target="_blank" rel="noopener noreferrer" className="text-2xl text-gray-300 hover:text-primary transition-transform transform hover:scale-110">
+                    <FaGithub />
+                  </a>
+                )}
+                {socials.linkedin && (
+                  <a href={socials.linkedin} target="_blank" rel="noopener noreferrer" className="text-2xl text-gray-300 hover:text-[#0A66C2] transition-transform transform hover:scale-110">
+                    <FaLinkedin />
+                  </a>
+                )}
+                {socials.twitter && (
+                  <a href={socials.twitter} target="_blank" rel="noopener noreferrer" className="text-2xl text-gray-300 hover:text-[#1DA1F2] transition-transform transform hover:scale-110">
+                    <FaTwitter />
+                  </a>
+                )}
+                {socials.blog && (
+                  <a href={socials.blog} target="_blank" rel="noopener noreferrer" className="text-2xl text-gray-300 hover:text-tertiary transition-transform transform hover:scale-110">
+                    <FaBlog />
+                  </a>
+                )}
+                {socials.instagram && (
+                  <a href={socials.instagram} target="_blank" rel="noopener noreferrer" className="text-2xl text-gray-300 hover:text-tertiary transition-transform transform hover:scale-110">
+                    <FaInstagram />
+                  </a>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+        {/* Right Column - Floating Image */}
+        {showRest && profile?.profile_image_url && (
+          <div className="flex-1 flex justify-center lg:justify-end mt-6 lg:mt-0 fade-in" style={{ animationDelay: '2.4s' }}>
+            <img
+              src={profile.profile_image_url}
+              alt={profile?.name || 'Profile'}
+              className="w-64 h-64 lg:w-[340px] lg:h-[340px] object-contain animate-float"
+              style={{ filter: 'drop-shadow(0 0 28px rgba(255, 45, 209, 0.5))' }}
+            />
+          </div>
+        )}
+      </section>
+      {/* CTA Section */}
+      {/* CTA Button Section - horizontally below hero */}
+    {showRest && (
+    <section className="w-full flex justify-center items-center mt-2 mb-8 fade-in" style={{ animationDelay: '2.3s' }}>
+        <button
+            className="
+              px-10 py-4 rounded-full
+              backdrop-blur-md
+              border border-white/20
+              shadow-lg
+              text-white text-xl font-bold
+              transition-all duration-400
+              hover:scale-105
+              hover:shadow-xl
+              hover:backdrop-blur-xl
+              hover:bg-transparent
+              hover:border-white
+              hover:text-white
+            "
+            style={{
+            letterSpacing: '1px',
+            boxShadow: "0 6px 40px 0 rgba(68,0,188,0.05)",
+            textShadow: "0 0 10px #fff5",
+            WebkitBackdropFilter: "blur(8px)",
+            backdropFilter: "blur(8px)"
+            }}
+            onClick={() => navigate('/contact')}
+        >
+            Request a custom solution
+        </button>
+    </section>
+
+)}
+
+
+
+      {/* Work Carousel Section */}
+      {showRest && (
+        <section className="relative z-10 px-4 py-8 max-w-6xl mx-auto fade-in" style={{ animationDelay: '2.8s' }}>
+          <WorkCarousel compact />
+          {showRest && (
+  <section className="w-full flex justify-center items-center mt-2 mb-8 fade-in" style={{ animationDelay: '2.9s' }}>
+    <button
+      className="
+        px-10 py-4 rounded-full
+        backdrop-blur-md
+        border border-white/20
+        shadow-lg
+        text-white text-xl font-bold
+        transition-all duration-400
+        hover:scale-105
+        hover:shadow-xl
+        hover:backdrop-blur-xl
+        hover:bg-transparent
+        hover:border-white
+        hover:text-white
+      "
+      style={{
+        letterSpacing: '1px',
+        boxShadow: "0 6px 40px 0 rgba(68,0,188,0.05)",
+        textShadow: "0 0 10px #fff5",
+        WebkitBackdropFilter: "blur(8px)",
+        backdropFilter: "blur(8px)",
+      }}
+      onClick={() => navigate('/work')}
+    >
+      Explore All My Work
+    </button>
+  </section>
+)}
+
+        </section>
+      )}
+      <style>{`
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .animate-float { animation: float 4s ease-in-out infinite; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-line { opacity: 0; background: linear-gradient(135deg, #FF2DD1, #63C8FF); -webkit-background-clip: text; -webkit-text-fill-color: transparent; animation: fadeInUp 0.6s forwards; display: block; overflow: visible; }
+        .fade-in { opacity: 0; animation: fadeInUp 0.8s forwards; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        @keyframes blink { 50% { opacity: 0; } }
+      `}</style>
+    </div>
+  );
+}
+
+export default Home;
+
+===== END OF frontend/src/pages/Home.jsx =====
+
+
+===== FILE: frontend/src/components/layout/Navbar.jsx =====
+
+// src/components/layout/Navbar.jsx
+import React, { useState } from "react";
+import { HiMenu, HiX } from "react-icons/hi";
+import { Link } from "react-router-dom";
+
+export const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const navLinks = ["Work", "Gallery", "Blog", "Resume", "Contact"];
+
+  return (
+    <>
+      <nav className="fixed top-0 left-0 w-full z-50 bg-gradient-to-b from-black/60 to-transparent backdrop-blur-lg shadow-lg">
+        <div className="max-w-7xl mx-auto px-8 flex justify-between items-center h-20 border-b border-white/15">
+          {/* Logo/Brand */}
+          <Link
+            to="/"
+            className="text-2xl font-extrabold text-white tracking-tight"
+            style={{
+              textShadow: "0 0 14px rgba(255, 255, 255, 0.8)",
+              letterSpacing: "1px",
+              cursor: "pointer"
+            }}
+          >
+            Pratik C
+          </Link>
+
+          {/* Desktop Menu */}
+          <div className="hidden md:flex space-x-10">
+            {navLinks.map((link, index) => {
+  if (link === "Contact") {
+    return (
+      <Link
+        key={link}
+        to="/contact"
+        className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+        style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+      >
+        {link}
+        <span className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+          style={{ background: "#4DFFBE" }}
+        ></span>
+      </Link>
+    );
+  } else if (link === "Gallery") {
+    return (
+      <Link
+        key={link}
+        to="/gallery"
+        className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+        style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+      >
+        {link}
+        <span className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+          style={{ background: "#FF2DD1" }}
+        ></span>
+      </Link>
+    );
+  } else if (link === "Work") {
+    return (
+      <Link
+        key={link}
+        to="/work"
+        className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+        style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+      >
+        {link}
+        <span className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+          style={{ background: "#00B2FF" }} // Change color if desired
+        ></span>
+      </Link>
+    );
+  } else if (link === "Resume") {
+      return (
+        <Link
+          key={link}
+          to="/resume"
+          className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+          style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+        >
+          {link}
+          <span
+            className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+            style={{ background: "#FFD600" }}
+          ></span>
+        </Link>
+      );
+    } else {
+    return (
+      <a
+        key={link}
+        href="#"
+        className="font-semibold text-white px-3 py-1 rounded-lg hover:text-accentYellow hover:bg-white/10 transition-all duration-300 relative group"
+        style={{ textShadow: "0 0 8px rgba(255, 255, 255, 0.4)" }}
+      >
+        {link}
+        <span
+          className="absolute -bottom-1 left-0 w-0 h-1 transition-all duration-300 group-hover:w-full rounded"
+          style={{
+            background: index % 2 === 0 ? "#FF2DD1" : "#4DFFBE",
+          }}
+        ></span>
+      </a>
+    );
+  }
+})}
+
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="p-2 text-white hover:text-accentYellow transition-colors"
+            >
+              {isOpen ? <HiX size={28} /> : <HiMenu size={28} />}
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <div
+          className={`md:hidden overflow-hidden transition-all duration-500 ease-in-out ${
+            isOpen ? "max-h-screen opacity-100" : "max-h-0 opacity-0"
+          }`}
+        >
+          <div className="px-8 py-6 space-y-3 bg-black/75 backdrop-blur-3xl rounded-b-xl shadow-xl">
+            {navLinks.map((link, index) => {
+              if (link === "Contact") {
+                return (
+                  <Link
+                    key={link}
+                    to="/contact"
+                    className="block font-medium text-gray-100 px-2 py-2 rounded hover:bg-white/10 hover:text-white transition-colors"
+                    onClick={() => setIsOpen(false)}
+                    style={{ textShadow: "0 0 6px rgba(255, 255, 255, 0.5)" }}
+                  >
+                    {link}
+                  </Link>
+                );
+              } else if (link === "Gallery") {
+                return (
+                  <Link
+                    key={link}
+                    to="/gallery"
+                    className="block font-medium text-gray-100 px-2 py-2 rounded hover:bg-white/10 hover:text-white transition-colors"
+                    onClick={() => setIsOpen(false)}
+                    style={{ textShadow: "0 0 6px rgba(255, 255, 255, 0.5)" }}
+                  >
+                    {link}
+                  </Link>
+                );
+              } else if (link === "Work") {
+                  return (
+                    <Link
+                      key={link}
+                      to="/work"
+                      className="block font-medium text-gray-100 px-2 py-2 rounded hover:bg-white/10 hover:text-white transition-colors"
+                      onClick={() => setIsOpen(false)}
+                      style={{ textShadow: "0 0 6px rgba(255, 255, 255, 0.5)" }}
+                    >
+                      {link}
+                    </Link>
+                  );
+                } else {
+                  return (
+                  <a
+                    key={link}
+                    href="#"
+                    className="block font-medium text-gray-100 px-2 py-2 rounded hover:bg-white/10 hover:text-white transition-colors"
+                    onClick={() => setIsOpen(false)}
+                    style={{ textShadow: "0 0 6px rgba(255, 255, 255, 0.5)" }}
+                  >
+                    {link}
+                  </a>
+                );
+              }
+            })}
+          </div>
+        </div>
+      </nav>
+      <div className="h-20"></div>
+    </>
+  );
+};
+
+export default Navbar;
+
+===== END OF frontend/src/components/layout/Navbar.jsx =====
+
+
+===== FILE: frontend/src/components/sections/WorkCarousel.jsx =====
+
+import React, { useMemo } from 'react';
+import { useFeaturedProjects } from '../../hooks/useAPI';
+import defaultProjectImage from '../../assets/default-project.jpg';
+
+const WorkCarousel = ({ compact = false, projectsData }) => {
+  // Fallback to hook if props not provided
+  const { data: fetchedData, loading, error } = useFeaturedProjects(10);
+
+  const projects = useMemo(() => {
+    const data = projectsData || fetchedData;
+    if (!data) return [];
+    if (Array.isArray(data)) return data;
+    if (data.results && Array.isArray(data.results)) return data.results;
+    return [];
+  }, [projectsData, fetchedData]);
+
+  if (!projectsData && loading) return <div className="text-gray-400 text-center py-8">Loading projects...</div>;
+  if (!projectsData && error) return <div className="text-red-500 text-center py-8">Failed to load projects.</div>;
+
+  return (
+    <section className={`relative z-10 ${compact ? 'py-4' : 'py-12'}`}>
+      <div className="w-full px-3 md:px-6">
+        <div
+          className="flex overflow-x-auto space-x-6 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent pb-4"
+          style={{ scrollSnapType: 'x mandatory' }}
+        >
+          {projects.map((project) => (
+            <div
+              key={project.id}
+              className="flex-none w-80 md:w-96 rounded-2xl bg-white/5 backdrop-blur border border-white/10 shadow-xl hover:scale-103 transition-transform duration-300"
+              style={{ scrollSnapAlign: 'start' }}
+            >
+              {/* Banner Image */}
+              <div
+                className="h-48 opacity-70 hover:opacity-100 transition-opacity duration-300 ease-in-out rounded-t-2xl bg-cover bg-center"
+                style={{ backgroundImage: `url(${project.image || defaultProjectImage})` }}
+              >
+                <div className="w-full h-full bg-black/40 rounded-t-2xl"></div>
+              </div>
+              {/* Card Content */}
+              <div className="p-4 space-y-3">
+                <h3 className="text-lg font-bold text-white">{project.title}</h3>
+                <p className="text-gray-300 text-sm">{project.description}</p>
+                <div className="text-xs text-gray-400">
+                  <p><span className="text-gray-200">Type:</span> {project.type || 'N/A'}</p>
+                </div>
+                {project.tech_stack?.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {project.tech_stack.slice(0, 5).map((tech) => (
+                      <span
+                        key={tech.name}
+                        className="px-2 py-1 text-xs rounded bg-white/10 text-gray-200 border border-white/20"
+                      >
+                        {tech.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <div className="flex flex-wrap gap-3 text-xs text-gray-400">
+                  {project.type === 'github' && (
+                    <>
+                      <span>★ {project.github_stars ?? 0}</span>
+                      <span>🍴 {project.github_forks ?? 0}</span>
+                    </>
+                  )}
+                  {project.type === 'linkedin' && (
+                    <>
+                      <span>👍 {project.linkedin_likes ?? 0}</span>
+                      <span>💬 {project.linkedin_comments ?? 0}</span>
+                    </>
+                  )}
+                </div>
+                {project.link && (
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block w-full text-center bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-lg transition-colors duration-300"
+                  >
+                    View Project
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default WorkCarousel;
+
+===== END OF frontend/src/components/sections/WorkCarousel.jsx =====
+
+

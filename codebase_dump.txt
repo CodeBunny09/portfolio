@@ -1,0 +1,787 @@
+CODEBASE DUMP - Sun Jan 25 15:31:53 IST 2026
+Root: frontend
+----------------------------------------
+
+===== FILE: frontend/src/index.css =====
+
+@import "tailwindcss";
+
+/* ---- ROOT RESET ---- */
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  background-color: #1A1A1B;
+  overscroll-behavior: none;
+}
+
+body {
+  display: block;
+  overflow-x: hidden;
+}
+
+/* ---- GLOBAL BACKGROUND ---- */
+#root {
+  position: relative;
+  isolation: isolate;
+}
+
+/* ---- ANIMATED NOISE (GIF) ---- */
+#root::before {
+  content: "";
+  position: fixed;
+  inset: -200%;
+  pointer-events: none;
+
+  background-image: url("/src/assets/static-glitch.gif");
+  background-repeat: repeat;
+  background-size: 150px 150px;
+
+  opacity: 0.12;
+  mix-blend-mode: color-dodge;
+
+  animation: noiseMove 1.5s steps(2) infinite;
+  z-index: 0;
+}
+
+/* ---- NOISE MOTION ---- */
+@keyframes noiseMove {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(120px, 120px, 0);
+  }
+}
+
+
+/* navbar styles */
+/* ===== NAVBAR STYLES ===== */
+
+/* Navbar Container */
+.navbar-container {
+  display: flex;
+  align-items: center;
+  height: 56px;
+  padding: 8px 10px;
+  gap: 40px;
+  background-color: rgba(15, 15, 15, 0.90);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid #0F0F0F;
+  border-radius: 28px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+}
+
+/* Avatar */
+.avatar-link {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.avatar-fallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #D0FF71 0%, #A0D050 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: black;
+  font-size: 16px;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+.avatar-availability-indicator {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background-color: #00FF00;
+  border-radius: 50%;
+  border: 2px solid #0F0F0F;
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* 3D Flip Text */
+.nav-flip-text {
+  position: relative;
+  display: block;
+  height: 24px;
+  overflow: hidden;
+  cursor: pointer;
+  perspective: 500px;
+}
+
+/* Availability Indicator */
+.availability-dot-container {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  flex-shrink: 0;
+}
+
+.availability-dot-glow {
+  position: absolute;
+  inset: 0;
+  width: 8px;
+  height: 8px;
+  background-color: #00FF00;
+  border-radius: 50%;
+  filter: blur(4px);
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.availability-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+  background-color: #00FF00;
+  border-radius: 50%;
+}
+
+/* Contact Button */
+.contact-button {
+  padding: 8px 20px;
+  background-color: white;
+  color: black;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.contact-button:hover {
+  background-color: #D0FF71;
+}
+
+/* Mobile Menu Button */
+.mobile-menu-button {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: #D0FF71;
+  color: black;
+  transition: background-color 0.3s ease;
+  flex-shrink: 0;
+}
+
+.mobile-menu-button:hover {
+  background-color: #B8E85F;
+}
+
+/* Mobile Menu Overlay */
+.mobile-menu-overlay {
+  position: absolute;
+  top: calc(100% + 16px);
+  left: 0;
+  right: 0;
+  padding: 32px;
+  background-color: rgba(15, 15, 15, 0.85);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5),
+              inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+===== FILE: frontend/src/components/Navbar.jsx =====
+
+import { motion, useScroll, useMotionValueEvent } from "framer-motion"
+import { useState } from "react"
+import { useProfile } from "../hooks/useAPI"
+
+// Navigation links configuration
+const NAV_LINKS = [
+  { label: "Home", href: "/#home" },
+  { label: "About", href: "/#about" },
+  { label: "Projects", href: "/#projects" },
+  { label: "Resume", href: "/#resume" },
+  { label: "Gallery", href: "/#gallery" },
+  { label: "Blogs", href: "/#blogs" },
+]
+
+// Custom 2-line hamburger menu icon
+function HamburgerIcon({ isOpen }) {
+  return (
+    <div className="w-5 h-4 flex flex-col justify-center gap-1.5">
+      <motion.div
+        animate={{
+          rotate: isOpen ? 45 : 0,
+          y: isOpen ? 5 : 0,
+        }}
+        transition={{ duration: 0.2 }}
+        className="w-full h-0.5 bg-black rounded-full"
+      />
+      <motion.div
+        animate={{
+          rotate: isOpen ? -45 : 0,
+          y: isOpen ? -5 : 0,
+        }}
+        transition={{ duration: 0.2 }}
+        className="w-full h-0.5 bg-black rounded-full"
+      />
+    </div>
+  )
+}
+
+// 3D Flip Text Component
+function FlipText({ children, href }) {
+  const [isHovered, setIsHovered] = useState(false)
+
+  return (
+    <a
+      href={href}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      className="nav-flip-text"
+    >
+      <div className="flex flex-col h-full">
+        {/* Primary Text (White) */}
+        <motion.span
+          animate={{
+            rotateX: isHovered ? -90 : 0,
+            y: isHovered ? "-100%" : "0%",
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 400,
+            damping: 30,
+          }}
+          className="text-sm font-normal text-white whitespace-nowrap h-6 flex items-center"
+          style={{
+            transformOrigin: "center bottom",
+            backfaceVisibility: "hidden",
+          }}
+        >
+          {children}
+        </motion.span>
+
+        {/* Hover Text (Lime Green) */}
+        <motion.span
+          animate={{
+            rotateX: isHovered ? 0 : 90,
+            y: isHovered ? "-100%" : "0%",
+          }}
+          transition={{
+            type: "spring",
+            stiffness: 400,
+            damping: 30,
+          }}
+          className="text-sm font-normal text-[#D0FF71] whitespace-nowrap h-6 flex items-center absolute top-full"
+          style={{
+            transformOrigin: "center top",
+            backfaceVisibility: "hidden",
+          }}
+        >
+          {children}
+        </motion.span>
+      </div>
+    </a>
+  )
+}
+
+// Available for work indicator component
+function AvailableIndicator() {
+  return (
+    <div className="flex items-center gap-2 whitespace-nowrap">
+      <span className="text-sm text-white font-normal">Available for work</span>
+      <div className="availability-dot-container">
+        <div className="availability-dot-glow" />
+        <div className="availability-dot" />
+      </div>
+    </div>
+  )
+}
+
+export default function Navbar() {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const [isMobileOpen, setIsMobileOpen] = useState(false)
+  const { scrollY } = useScroll()
+
+  // Fetch data using custom hooks
+  const { data: profileData } = useProfile()
+
+  // Scroll direction detection
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious()
+    if (latest > previous && latest > 100) {
+      setIsCollapsed(true)
+    } else if (latest < previous) {
+      setIsCollapsed(false)
+    }
+  })
+
+  // Extract first letter for avatar fallback
+  const avatarLetter = profileData?.name?.charAt(0).toUpperCase() || 'P'
+
+  // Get availability status
+  const isAvailable = profileData?.is_available || false
+
+  return (
+    <>
+      {/* Desktop Navbar */}
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ 
+          y: 0, 
+          opacity: 1
+        }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="fixed top-5 left-1/2 -translate-x-1/2 z-50 hidden lg:block"
+      >
+        <motion.div
+          animate={{ 
+            paddingLeft: isCollapsed ? "10px" : "10px",
+            paddingRight: isCollapsed ? "10px" : "10px",
+            gap: isCollapsed ? "12px" : "40px"
+          }}
+          transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          className="navbar-container"
+        >
+          {/* Avatar with availability indicator */}
+          <a href="/#home" className="avatar-link">
+            {profileData?.profile_image_url ? (
+              <img 
+                src={profileData.profile_image_url} 
+                alt={profileData.name}
+                className="w-10 h-10 rounded-full object-cover ring-2 ring-white/10"
+              />
+            ) : (
+              <div className="avatar-fallback">
+                {avatarLetter}
+              </div>
+            )}
+            {isAvailable && (
+              <div className="avatar-availability-indicator" />
+            )}
+          </a>
+
+          {/* Navigation Links - Hidden when collapsed */}
+          <motion.div
+            animate={{ 
+              opacity: isCollapsed ? 0 : 1,
+              width: isCollapsed ? 0 : "auto",
+              marginLeft: isCollapsed ? 0 : 0,
+              marginRight: isCollapsed ? 0 : 0
+            }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="flex items-center gap-10 overflow-hidden"
+          >
+            {NAV_LINKS.map((link) => (
+              <FlipText key={link.label} href={link.href}>
+                {link.label}
+              </FlipText>
+            ))}
+          </motion.div>
+
+          {/* Dynamic Right Section */}
+          <motion.div
+            className="flex items-center flex-shrink-0"
+            animate={{
+              marginLeft: isCollapsed ? "8px" : 0
+            }}
+            transition={{ duration: 0.3 }}
+          >
+            {isCollapsed && isAvailable ? (
+              <motion.div
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.3 }}
+              >
+                <AvailableIndicator />
+              </motion.div>
+            ) : (
+              <motion.a
+                href="/#contact"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
+                transition={{ duration: 0.3 }}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="contact-button"
+              >
+                Contact
+              </motion.a>
+            )}
+          </motion.div>
+        </motion.div>
+      </motion.nav>
+
+      {/* Mobile & Tablet Navbar */}
+      <motion.nav
+        initial={{ y: -100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        className="fixed top-4 left-1/2 -translate-x-1/2 z-50 lg:hidden"
+        style={{ width: "calc(100% - 2rem)", maxWidth: "600px" }}
+      >
+        <div className="navbar-container">
+          {/* Avatar with availability */}
+          <a href="/#home" className="avatar-link">
+            {profileData?.profile_image_url ? (
+              <img 
+                src={profileData.profile_image_url} 
+                alt={profileData.name}
+                className="w-10 h-10 rounded-full object-cover ring-2 ring-white/10"
+              />
+            ) : (
+              <div className="avatar-fallback">
+                {avatarLetter}
+              </div>
+            )}
+            {isAvailable && (
+              <div className="avatar-availability-indicator" />
+            )}
+          </a>
+
+          {/* Availability text - Always visible on mobile */}
+          {isAvailable && (
+            <div className="flex-1 min-w-0 mx-3">
+              <AvailableIndicator />
+            </div>
+          )}
+
+          {/* Mobile Menu Button */}
+          <button
+            onClick={() => setIsMobileOpen(!isMobileOpen)}
+            className="mobile-menu-button"
+            aria-label="Toggle menu"
+          >
+            <HamburgerIcon isOpen={isMobileOpen} />
+          </button>
+        </div>
+
+        {/* Mobile Menu Overlay */}
+        <motion.div
+          initial={false}
+          animate={{
+            opacity: isMobileOpen ? 1 : 0,
+            scale: isMobileOpen ? 1 : 0.95,
+            pointerEvents: isMobileOpen ? "auto" : "none"
+          }}
+          transition={{ duration: 0.3, ease: "easeOut" }}
+          className="mobile-menu-overlay"
+        >
+          <div className="flex flex-col gap-6">
+            {/* Navigation Links */}
+            {NAV_LINKS.map((link, index) => (
+              <motion.a
+                key={link.label}
+                href={link.href}
+                initial={false}
+                animate={{
+                  opacity: isMobileOpen ? 1 : 0,
+                  x: isMobileOpen ? 0 : -20
+                }}
+                transition={{ delay: index * 0.05 }}
+                onClick={() => setIsMobileOpen(false)}
+                className="text-2xl font-normal text-white hover:text-[#D0FF71] 
+                         transition-colors duration-300"
+              >
+                {link.label}
+              </motion.a>
+            ))}
+            
+            {/* Contact Button */}
+            <motion.a
+              href="/#contact"
+              initial={false}
+              animate={{
+                opacity: isMobileOpen ? 1 : 0,
+                y: isMobileOpen ? 0 : -10
+              }}
+              transition={{ delay: NAV_LINKS.length * 0.05 }}
+              onClick={() => setIsMobileOpen(false)}
+              className="mt-4 px-6 py-4 bg-[#D0FF71] text-black font-medium text-center rounded-full
+                       hover:bg-[#B8E85F] transition-all duration-300 text-lg"
+            >
+              Contact
+            </motion.a>
+          </div>
+        </motion.div>
+      </motion.nav>
+    </>
+  )
+}
+
+===== FILE: frontend/src/hooks/useAPI.js =====
+
+// src/hooks/useAPI.js
+import { useEffect, useState } from "react";
+
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+
+/* ===================== FEATURED PROJECTS ===================== */
+export function useFeaturedProjects(limit = 4) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const res = await fetch(
+          `${API_BASE_URL}/projects/?featured=true&limit=${limit}`
+        );
+        if (!res.ok) throw new Error(res.status);
+        const json = await res.json();
+        if (Array.isArray(json)) setData(json);
+        else if (json.results) setData(json.results);
+        else setData([]);
+      } catch (e) {
+        setError(e.message);
+        setData([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProjects();
+  }, [limit]);
+
+  return { data, loading, error };
+}
+
+/* ===================== PROFILE ===================== */
+export function useProfile() {
+  const [data, setData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/profile/`);
+        if (!res.ok) throw new Error(res.status);
+        const json = await res.json();
+        setData(json);
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchProfile();
+  }, []);
+
+  return { data, loading, error };
+}
+
+/* ===================== TESTIMONIALS (WITH FALLBACK) ===================== */
+const FALLBACK_TESTIMONIALS = [{}
+];
+
+export function useTestimonials() {
+  const [data, setData] = useState(FALLBACK_TESTIMONIALS);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    async function fetchTestimonials() {
+      try {
+        const res = await fetch(`${API_BASE_URL}/testimonials/`);
+        if (!res.ok) throw new Error(res.status);
+        const json = await res.json();
+        if (Array.isArray(json) && json.length > 0) {
+          setData(json);
+        }
+      } catch (e) {
+        setError(e.message);
+        // fallback already set
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchTestimonials();
+  }, []);
+
+  return { data, loading, error };
+}
+
+/* ===================== GALLERY ===================== */
+export function useGalleryImages() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/gallery/`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (Array.isArray(json)) setData(json);
+        else if (json.results) setData(json.results);
+        else setData([]);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+}
+
+/* ===================== CONTACT PLATFORMS ===================== */
+export function useContactPlatforms() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/contact-platforms/`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (Array.isArray(json)) setData(json);
+        else if (json.results) setData(json.results);
+        else setData([]);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+}
+
+/* ===================== ALL PROJECTS ===================== */
+export function useAllProjects({ page = 1, page_size = 18 } = {}) {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(
+      `${API_BASE_URL}/projects?page=${page}&page_size=${page_size}`
+    )
+      .then((res) => res.json())
+      .then((json) => {
+        if (Array.isArray(json)) setData(json);
+        else if (json.results) setData(json.results);
+        else setData([]);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, [page, page_size]);
+
+  return { data, loading, error };
+}
+
+/* ===================== RESUME ===================== */
+export function useResume() {
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/resume/`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.results) setData(json.results);
+        else setData(json);
+      })
+      .catch((e) => setError(e.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return { data, loading, error };
+}
+
+/* ===================== GALLERY ACTIONS (REQUIRED BY ModalPost.jsx) ===================== */
+
+export async function addGalleryLike(id) {
+  return fetch(`${API_BASE_URL}/gallery/${id}/add_like/`, {
+    method: "POST",
+  });
+}
+
+export async function addGalleryComment(id, text) {
+  return fetch(`${API_BASE_URL}/gallery/${id}/add_comment/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text }),
+  });
+}
+
+
+===== FILE: frontend/src/main.jsx =====
+
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import App from './App'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+)
+
+
+===== FILE: frontend/src/App.jsx =====
+
+import { motion, useScroll, useTransform } from "framer-motion"
+import { useRef } from "react"
+import Navbar from "./components/Navbar"
+
+const cards = [
+  { id: 1, color: "bg-red-500", label: "Card One" },
+  { id: 2, color: "bg-blue-500", label: "Card Two" },
+  { id: 3, color: "bg-green-500", label: "Card Three" },
+  { id: 4, color: "bg-purple-500", label: "Card Four" },
+]
+
+export default function App() {
+  const containerRef = useRef(null)
+
+  // 🔴 IMPORTANT: DO NOT use target-based scroll here
+  const { scrollYProgress } = useScroll()
+
+  return (
+    <div className="relative z-10 text-white w-screen">
+      {/* Navbar */}
+      <Navbar />
+
+      {/* Scroll space */}
+      <div ref={containerRef} className="relative h-[400vh]">
+        <div className="sticky top-0 h-screen flex items-center justify-center">
+          <div className="relative w-80 h-96">
+            {cards.map((card, index) => {
+              const start = index / cards.length
+              const end = (index + 1) / cards.length
+
+              const y = useTransform(scrollYProgress, [start, end], [120, 0])
+              const opacity = useTransform(scrollYProgress, [start, end], [0, 1])
+              const scale = useTransform(scrollYProgress, [start, end], [0.96, 1])
+
+              return (
+                <motion.div
+                  key={card.id}
+                  style={{
+                    y,
+                    opacity,
+                    scale,
+                    top: index * 15,
+                    zIndex: index + 1,
+                  }}
+                  className={`absolute inset-0 rounded-2xl shadow-2xl ${card.color}
+                    flex items-center justify-center text-2xl font-bold`}
+                >
+                  {card.label}
+                </motion.div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

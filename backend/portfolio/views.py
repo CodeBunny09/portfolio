@@ -3,9 +3,9 @@ from rest_framework import generics, status, viewsets, permissions
 from rest_framework.decorators import api_view, action
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from .models import Profile, Project, BlogPost, ContactPlatform, Resume
+from .models import Profile, Project, BlogPost, ContactPlatform, Resume, Testimonial
 from rest_framework import viewsets
-from .serializers import ProfileSerializer, ProjectSerializer, BlogPostSerializer, ContactPlatformSerializer, ResumeSerializer
+from .serializers import ProfileSerializer, ProjectSerializer, BlogPostSerializer, ContactPlatformSerializer, ResumeSerializer, TestimonialSerializer
 from rest_framework.generics import RetrieveAPIView
 
 
@@ -106,3 +106,9 @@ class ResumeListView(generics.ListAPIView):
     queryset = Resume.objects.order_by('-uploaded_at')
     serializer_class = ResumeSerializer
     permission_classes = [permissions.AllowAny]
+
+
+
+class TestimonialListView(generics.ListAPIView):
+    queryset = Testimonial.objects.all().order_by('-created_at')
+    serializer_class = TestimonialSerializer

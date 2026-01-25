@@ -12,6 +12,7 @@ urlpatterns = [
     path('projects/', views.ProjectListView.as_view(), name='projects'),
     path('projects/<uuid:pk>/', views.ProjectDetailView.as_view(), name='project-detail'),
     path('blog/', views.BlogPostListView.as_view(), name='blog'),
+    path('testimonials/', views.TestimonialListView.as_view(), name='testimonial-list'),
     path('resume/', views.ResumeListView.as_view(), name='resume-list'),
-    path('', include(router.urls)),  
+    path('', include(router.urls)),
 ]
